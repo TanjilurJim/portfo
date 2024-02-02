@@ -11,6 +11,11 @@
   color: black; /* This will set your text color to black */
   /* Add any other styles you want here */
 }
-
+.custom-hover:hover {
+    color: #3498db; /* Your desired hover color */
+    text-decoration: underline; /* Adds underline on hover */
+    transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth transition for color and decoration */
+  }
+  
 
 /*# sourceMappingURL=main.70a66962.map*/
