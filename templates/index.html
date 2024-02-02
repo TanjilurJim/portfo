@@ -64,13 +64,15 @@
                 <span id="typed"></span>
               </h1>
             </div>
+            
           </div>
         </div>
+        <section class="container" style="color: black;">
+          <h2 style="color: black;">Last modified on</h2>
+          <p id="lasttime" style="color: black;"></p>
+      </section>
       </div>
-      <section class="container" style="color: black;">
-        <h2 style="color: black;">Last modified on</h2>
-        <p id="lasttime" style="color: black;"></p>
-    </section>
+     
     
     </div>
     
@@ -81,8 +83,20 @@
     
 </section>
 
-<script src="./static/script.js">
-</script>
+<footer class="footer-container text-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <p>© Tanjilur Rahman </p>
+      </div>
+    </div>
+    <!-- Adding the last modified section with a class for styling -->
+    <section class="container last-modified">
+      <h2>Last modified on</h2>
+      <p id="lasttime"></p>
+    </section>
+  </div>
+</footer>
 <script>
   document.addEventListener("DOMContentLoaded", function (event) {
      type();
