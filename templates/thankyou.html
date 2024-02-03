@@ -59,9 +59,21 @@
           
           <div class="row">
             <div class="col-md-10 col-md-offset-1">
-                Thankyou  ! I will get in touch with you shortly ! 
-          
+                
+              
+            <div id="thankyouMessage">
+              <h3>Thank you! I will get in touch with you shortly!</h3>
+             
             </div>
+            <div id="gameContainer">
+              <h2>Play Rock, Paper, Scissors in the meantime ?!</h2>
+              <button id="rock">Rock</button>
+              <button id="paper">Paper</button>
+              <button id="scissors">Scissors</button>
+              <p id="gameResult"></p>
+            </div>
+            
+
 
           </div>
          
@@ -86,6 +98,35 @@
     </div>
   </footer>
 
+  <script>
+    const gameChoices = ['Rock', 'Paper', 'Scissors'];
+    const gameResult = document.getElementById('gameResult');
+  
+    document.getElementById('rock').addEventListener('click', function() { playGame('Rock'); });
+    document.getElementById('paper').addEventListener('click', function() { playGame('Paper'); });
+    document.getElementById('scissors').addEventListener('click', function() { playGame('Scissors'); });
+  
+    function playGame(userChoice) {
+      const computerChoice = gameChoices[Math.floor(Math.random() * 3)];
+      const result = determineWinner(userChoice, computerChoice);
+      gameResult.textContent = `You chose ${userChoice}. Computer chose ${computerChoice}. ${result}`;
+    }
+  
+    function determineWinner(userChoice, computerChoice) {
+      if (userChoice === computerChoice) {
+        return "It's a tie!";
+      }
+      
+      if ((userChoice === 'Rock' && computerChoice === 'Scissors') ||
+          (userChoice === 'Paper' && computerChoice === 'Rock') ||
+          (userChoice === 'Scissors' && computerChoice === 'Paper')) {
+        return "You win!";
+      } else {
+        return "You lose!";
+      }
+    }
+  </script>
+  
 <script>
   document.addEventListener("DOMContentLoaded", function (event) {
      navActivePage();
