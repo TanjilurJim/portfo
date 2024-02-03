@@ -35,6 +35,17 @@
   color: #3498db; /* Your desired hover color */
 }
 
+.social-icons a {
+  display: inline-block;
+  margin-right: 15px; /* Adjust the spacing between icons as needed */
+  color: inherit; /* or any color you prefer */
+  text-decoration: none;
+}
+
+.social-icons i {
+  margin-right: 5px; /* Space between icon and text */
+}
+
 
   
 
