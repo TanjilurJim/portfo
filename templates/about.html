@@ -11,7 +11,7 @@
 
   <!-- Disable tap highlight on IE -->
   <meta name="msapplication-tap-highlight" content="no">
-  
+  <link rel="stylesheet" href="path/to/lightbox2/css/lightbox.min.css">
   <link rel="apple-touch-icon" sizes="180x180" href="./static/assets/apple-icon-180x180.png">
   <link href="./static/assets/Icon.png" rel="icon">
   <link href="https://fonts.googleapis.com/css2?family=Single+Day&display=swap" rel="stylesheet">
@@ -85,7 +85,8 @@
                   Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus iaculis magna sagittis elit sagittis, at hendrerit lorem venenatis. Morbi accumsan iaculis blandit. Cras ultrices hendrerit nisl.</p>
                 </div>
                 <div class="col-xs-12 col-md-6">
-                  <img src="./static/assets/images/1.jpg" class="img-responsive" alt="">
+                  <a href="./static/assets/images/2.jpg" data-lightbox="image-group" data-title="Image 2">
+                  <img src="./static/assets/images/2.jpg" class="img-responsive image-zoom" alt=""></a>
                 </div>
               </div>
             </div>
@@ -98,15 +99,22 @@
   </div>
 
 
-<footer class="footer-container text-center">
+  <footer class="footer-container text-center">
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
-        <p>© UNTITLED | Website created with <a href="http://www.mashup-template.com/" title="Create website with free html template">Mashup Template</a>/<a href="https://www.unsplash.com/" title="Beautiful Free Images">Unsplash</a></p>
+        <p><a href="https://github.com/TanjilurJim" title="" class="fa-icon"target="_blank"> @TanjilurJim </a></p>
       </div>
     </div>
+    
+    <!-- Adding the last modified section with a class for styling -->
+    
+    <section class="container" style="color: black;">
+      <h2 style="color: black;">Last modified on</h2>
+      <p id="lasttime" style="color: black;"></p>
+  </section>
   </div>
-</footer>
+</footer> 
 
 <script>
   document.addEventListener("DOMContentLoaded", function (event) {

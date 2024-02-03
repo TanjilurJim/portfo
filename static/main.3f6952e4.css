@@ -23,7 +23,7 @@
   }
   
   .image-zoom:hover {
-    transform: scale(1.9); /* Increase the size of the image on hover */
+    transform: scale(1.5); /* Increase the size of the image on hover */
     cursor: zoom-in; /* Change the cursor to a zoom-in icon on hover */
   }
   /* CSS for the color-changing transition effect */
