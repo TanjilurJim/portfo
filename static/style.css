@@ -1,3 +1,6 @@
 body {
  background-color: green
 }
+.background {
+    background-color: color-mix(in hsl longer hue, color percentage, color percentage);
+}
