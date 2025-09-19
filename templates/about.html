@@ -126,16 +126,18 @@
     
     <section class="container" style="color: black;">
       <h2 style="color: black;">Last modified on</h2>
-      <p id="lasttime" style="color: black;"></p>
+        <p class="text-black text-sm font-mono">
+            <span id="lasttime">{{ SITE_LAST_MODIFIED }}</span>
+          </p>
   </section>
   </div>
 </footer> 
 
-<script>
+<!-- <script>
   document.addEventListener("DOMContentLoaded", function (event) {
      navActivePage();
   });
-</script>
+</script> -->
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID 
 

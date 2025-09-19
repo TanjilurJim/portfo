@@ -2,64 +2,118 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tanjilur's Website</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Roboto Mono', monospace;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Tanjilur Rahman</title>
 
-    .typing-cursor::after {
-      content: '|';
-      animation: blink 1s infinite;
-    }
+  <!-- Canonical & indexing -->
+  <link rel="canonical" href="https://tanjilurjdot.pythonanywhere.com/index.html" />
+  <meta name="robots" content="index,follow" />
 
-    @keyframes blink {
+  <!-- Favicon -->
+  <link href="./static/assets/Icon.png" rel="icon">
 
-      0%,
-      50% {
-        opacity: 1;
+
+  <!-- Description (appears in Google) -->
+  <meta name="description"
+        content="Tanjilur Rahman — Software Engineer in Dhaka. Laravel, PHP, Python, Django, REST APIs, Inertia/React. Available for freelance projects." />
+
+  <!-- Optional: keywords don't help much, but harmless -->
+  <meta name="keywords" content="Tanjilur Rahman, Laravel developer, Python developer, Django developer, Software Engineer Bangladesh, freelancer" />
+
+  <!-- Open Graph (Facebook/LinkedIn) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Software Engineer (Laravel, Django) — Tanjilur Rahman" />
+  <meta property="og:description" content="Laravel & Django developer in Dhaka — portfolio, projects, contact." />
+  <meta property="og:url" content="https://tanjilurjdot.pythonanywhere.com/index.html" />
+  <meta property="og:image" content="https://tanjilurjdot.pythonanywhere.com/static/assets/og-cover.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Software Engineer (Laravel, Django) — Tanjilur Rahman" />
+  <meta name="twitter:description" content="Laravel & Django developer in Dhaka — portfolio, projects, contact." />
+  <meta name="twitter:image" content="https://tanjilurjdot.pythonanywhere.com/static/assets/og-cover.jpg" />
+
+  <!-- Site verification (paste real tokens from Search Console/Bing) -->
+  <meta name="google-site-verification" content="PASTE_GOOGLE_TOKEN" />
+  <meta name="msvalidate.01" content="PASTE_BING_TOKEN" />
+
+  <!-- Performance niceties -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" as="style" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" />
+  <script src="https://cdn.tailwindcss.com" defer></script>
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://tanjilurjdot.pythonanywhere.com/#website",
+        "url": "https://tanjilurjdot.pythonanywhere.com/",
+        "name": "Tanjilur Rahman — Software Engineer",
+        "inLanguage": "en",
+        "publisher": {
+          "@type": "Person",
+          "name": "Tanjilur Rahman",
+          "url": "https://tanjilurjdot.pythonanywhere.com/"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://tanjilurjdot.pythonanywhere.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://tanjilurjdot.pythonanywhere.com/index.html#webpage",
+        "url": "https://tanjilurjdot.pythonanywhere.com/index.html",
+        "name": "Software Engineer (Laravel, Django) — Tanjilur Rahman",
+        "isPartOf": { "@id": "https://tanjilurjdot.pythonanywhere.com/#website" },
+        "datePublished": "2025-09-01",
+        "dateModified": "2025-09-19",
+        "inLanguage": "en",
+        "description": "Portfolio of Tanjilur Rahman, a Software Engineer specializing in Laravel and Django."
+      },
+      {
+        "@type": "Person",
+        "@id": "https://tanjilurjdot.pythonanywhere.com/#person",
+        "name": "Tanjilur Rahman",
+        "alternateName": ["Tanjilur Rahman Jim", "Tanjilur Jim"],
+        "url": "https://tanjilurjdot.pythonanywhere.com/",
+        "image": "https://tanjilurjdot.pythonanywhere.com/static/assets/profile.jpg",
+        "jobTitle": "Software Engineer",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Rafusoft"
+        },
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "BRAC University"
+        },
+        "knowsAbout": ["Laravel", "PHP", "Inertia.js", "React", "Tailwind CSS", "MySQL", "Python", "Django", "REST APIs", "DevOps"],
+        "skills": ["Laravel", "PHP", "React", "Inertia.js", "MySQL", "Python", "Django", "REST API design", "Deployment"],
+        "knowsLanguage": ["en", "bn"],
+        "sameAs": [
+          "https://github.com/TanjilurJim",
+          "https://www.linkedin.com/in/PASTE_LINKEDIN_SLUG",
+          "https://x.com/PASTE_TWITTER_HANDLE"
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://tanjilurjdot.pythonanywhere.com/index.html" }
+        ]
       }
-
-      51%,
-      100% {
-        opacity: 0;
-      }
-    }
-
-    .border-animation {
-      position: relative;
-    }
-
-    .border-animation::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border: 2px solid transparent;
-      background: linear-gradient(45deg, #000, #333, #000) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: exclude;
-      animation: borderMove 3s linear infinite;
-    }
-
-    @keyframes borderMove {
-      0% {
-        background-position: 0% 0%;
-      }
-
-      100% {
-        background-position: 100% 100%;
-      }
-    }
-  </style>
+    ]
+  }
+  </script>
 </head>
+
 
 <body class="bg-white text-black">
   <!-- Navigation -->
