@@ -1,237 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanjilur's Website</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto Mono', monospace;
-        }
-        
-        .typing-cursor::after {
-            content: '|';
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        
-        .border-animation {
-            position: relative;
-        }
-        
-        .border-animation::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px solid transparent;
-            background: linear-gradient(45deg, #000, #333, #000) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: exclude;
-            animation: borderMove 3s linear infinite;
-        }
-        
-        @keyframes borderMove {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
-        }
-    </style>
-</head>
-<body class="bg-white text-black">
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-black">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Mobile menu button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-black hover:text-gray-600 focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path id="menu-open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            <path id="menu-close" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Desktop navigation -->
-                <div class="hidden md:block w-full">
-                    <div class="flex items-baseline justify-center space-x-8">
-                        <a href="index.html" class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">01 : Home</a>
-                        <a href="works.html" class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">02 : Works</a>
-                        <a href="about.html" class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">03 : About me</a>
-                        <a href="contact.html" class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">04 : Contact</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-black">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="index.html" class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">01 : Home</a>
-                <a href="works.html" class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">02 : Works</a>
-                <a href="about.html" class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">03 : About me</a>
-                <a href="contact.html" class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">04 : Contact</a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <main class="min-h-screen flex items-center justify-center bg-white pt-16">
-        <div class="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-            <div class="space-y-8">
-                <!-- Main Heading -->
-                <div class="space-y-6">
-                    <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight">
-                        Hello,
-                    </h1>
-                    
-                    <!-- Typing Animation Container -->
-                    <div class="h-16 sm:h-20 flex items-center justify-center">
-                        <h2 id="typed-text" class="text-2xl sm:text-3xl lg:text-4xl font-mono typing-cursor">
-                            I'm Tanjilur Rahman
-                        </h2>
-                    </div>
-                </div>
-                
-                <!-- Description -->
-                <div class="max-w-2xl mx-auto">
-                    <p class="text-lg sm:text-xl font-mono leading-relaxed">
-                        > Passionate about creating digital experiences<br>
-                        > through code and design
-                    </p>
-                </div>
-                
-                <!-- ASCII Art Divider -->
-                <div class="py-8">
-                    <div class="font-mono text-xs sm:text-sm text-gray-600 leading-tight">
-                        <pre class="inline-block">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanjilur's Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    .typing-cursor::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      50% {
+        opacity: 1;
+      }
+
+      51%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .border-animation {
+      position: relative;
+    }
+
+    .border-animation::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 2px solid transparent;
+      background: linear-gradient(45deg, #000, #333, #000) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: exclude;
+      animation: borderMove 3s linear infinite;
+    }
+
+    @keyframes borderMove {
+      0% {
+        background-position: 0% 0%;
+      }
+
+      100% {
+        background-position: 100% 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white text-black">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" class="text-black hover:text-gray-600 focus:outline-none">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path id="menu-open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16" />
+              <path id="menu-close" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Desktop navigation -->
+        <div class="hidden md:block w-full">
+          <div class="flex items-baseline justify-center space-x-8">
+            <a href="index.html"
+              class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">01 :
+              Home</a>
+            <a href="works.html"
+              class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">02 :
+              Works</a>
+            <a href="about.html"
+              class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">03 :
+              About me</a>
+            <a href="contact.html"
+              class="text-black hover:bg-black hover:text-white px-3 py-2 transition-all duration-300 font-mono">04 :
+              Contact</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-black">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html"
+          class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">01 : Home</a>
+        <a href="works.html"
+          class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">02 : Works</a>
+        <a href="about.html"
+          class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">03 : About
+          me</a>
+        <a href="contact.html"
+          class="text-black hover:bg-black hover:text-white block px-3 py-2 transition-all duration-300">04 :
+          Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <main class="min-h-screen flex items-center justify-center bg-white pt-16">
+    <div class="text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+      <div class="space-y-8">
+        <!-- Main Heading -->
+        <div class="space-y-6">
+          <h1 class="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight">
+            Hello,
+          </h1>
+
+          <!-- Typing Animation Container -->
+          <div class="h-16 sm:h-20 flex items-center justify-center">
+            <h2 id="typed-text" class="text-2xl sm:text-3xl lg:text-4xl font-mono typing-cursor">
+              I'm Tanjilur Rahman
+            </h2>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="max-w-2xl mx-auto">
+          <p class="text-lg sm:text-xl font-mono leading-relaxed">
+            > Passionate about creating digital experiences<br>
+            > through code and design
+          </p>
+        </div>
+
+        <!-- ASCII Art Divider -->
+        <div class="py-8">
+          <div class="font-mono text-xs sm:text-sm text-gray-600 leading-tight">
+            <pre class="inline-block">
     ┌─────────────────────────────────┐
     │  What you seek is seeking you   │
     │                                 │
     │                         - Rumi  │
     └─────────────────────────────────┘
                         </pre>
-                    </div>
-                </div>
-                
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                    <a href="works.html" class="group border-2 border-black bg-black text-white px-8 py-4 font-mono hover:bg-white hover:text-black transition-all duration-300">
-                        [ View My Work ]
-                    </a>
-                    <a href="contact.html" class="border-2 border-black bg-white text-black px-8 py-4 font-mono hover:bg-black hover:text-white transition-all duration-300">
-                        [ Get In Touch ]
-                    </a>
-                </div>
-                
-                <!-- Terminal-like output -->
-                <div class="max-w-md mx-auto mt-12 p-4 border-2 border-black bg-gray-50 text-left font-mono text-sm">
-                    <div class="mb-2">
-                        <span class="text-gray-600">$</span> whoami
-                    </div>
-                    <div class="mb-2">tanjilur_rahman</div>
-                    <div class="mb-2">
-                        <span class="text-gray-600">$</span> cat skills.txt
-                    </div>
-                    <div class="space-y-1">
-                        <div>• Python</div>
-                        <div>• PHP</div>
-                        <div>• Laravel</div>
-                        <div>• Django</div>
-                        <div>• Ract.js ( beginner )</div>
-                    </div>
-                    <div class="mt-2">
-                        <span class="text-gray-600">$</span> <span class="typing-cursor"></span>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-black py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-4">
-                <div class="font-mono">
-                    <a href="https://github.com/TanjilurJim" target="_blank" class="text-black hover:bg-black hover:text-white px-4 py-2 border border-black transition-all duration-300 inline-block">
-                        @TanjilurJim
-                    </a>
-                </div>
-                
-                <div class="border-t border-black pt-4">
-                    <p class="text-black text-sm font-mono">
-                        Last modified on <span id="lasttime"></span>
-                    </p>
-                </div>
-            </div>
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <a href="works.html"
+            class="group border-2 border-black bg-black text-white px-8 py-4 font-mono hover:bg-white hover:text-black transition-all duration-300">
+            [ View My Work ]
+          </a>
+          <a href="contact.html"
+            class="border-2 border-black bg-white text-black px-8 py-4 font-mono hover:bg-black hover:text-white transition-all duration-300">
+            [ Get In Touch ]
+          </a>
         </div>
-    </footer>
 
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            const openIcon = document.getElementById('menu-open');
-            const closeIcon = document.getElementById('menu-close');
-            
-            menu.classList.toggle('hidden');
-            openIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
-        });
+        <!-- Terminal-like output -->
+        <div class="max-w-md mx-auto mt-12 p-4 border-2 border-black bg-gray-50 text-left font-mono text-sm">
+          <div class="mb-2">
+            <span class="text-gray-600">$</span> whoami
+          </div>
+          <div class="mb-2">tanjilur_rahman</div>
+          <div class="mb-2">
+            <span class="text-gray-600">$</span> cat skills.txt
+          </div>
+          <div class="space-y-1">
+            <div>• Python</div>
+            <div>• PHP</div>
+            <div>• Laravel</div>
+            <div>• Django</div>
+            <div>• Ract.js ( beginner )</div>
+          </div>
+          <div class="mt-2">
+            <span class="text-gray-600">$</span> <span class="typing-cursor"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-        // Typing animation
-        const texts = [
-            "I'm Tanjilur Rahman",
-            "I'm A Web Developer",
-            "I'm A CSE Graduate from Brac University"
-        ];
-        
-        let textIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        const typedElement = document.getElementById('typed-text');
-        
-        function typeAnimation() {
-            const currentText = texts[textIndex];
-            
-            if (isDeleting) {
-                typedElement.textContent = currentText.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                typedElement.textContent = currentText.substring(0, charIndex + 1);
-                charIndex++;
-            }
-            
-            let speed = isDeleting ? 50 : 100;
-            
-            if (!isDeleting && charIndex === currentText.length) {
-                speed = 2000; // Pause at end
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                textIndex = (textIndex + 1) % texts.length;
-                speed = 500; // Pause before next text
-            }
-            
-            setTimeout(typeAnimation, speed);
-        }
-        
-        // Start typing animation
-        setTimeout(typeAnimation, 1000);
-        
-        // Set last modified date
-        document.getElementById('lasttime').textContent = new Date().toLocaleDateString();
-        
-        // Console easter egg
-        console.log(`
+  <!-- Footer -->
+  <footer class="bg-white border-t border-black py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center space-y-4">
+        <div class="font-mono">
+          <a href="https://github.com/TanjilurJim" target="_blank"
+            class="text-black hover:bg-black hover:text-white px-4 py-2 border border-black transition-all duration-300 inline-block">
+            @TanjilurJim
+          </a>
+        </div>
+
+        <div class="border-t border-black pt-4">
+          <p class="text-black text-sm font-mono">
+            Last modified on <span id="lasttime">{{ SITE_LAST_MODIFIED }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+      const menu = document.getElementById('mobile-menu');
+      const openIcon = document.getElementById('menu-open');
+      const closeIcon = document.getElementById('menu-close');
+
+      menu.classList.toggle('hidden');
+      openIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    });
+
+    // Typing animation
+    const texts = [
+      "I'm Tanjilur Rahman",
+      "I'm A Web Developer",
+      "I'm A CSE Graduate from Brac University"
+    ];
+
+    let textIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    const typedElement = document.getElementById('typed-text');
+
+    function typeAnimation() {
+      const currentText = texts[textIndex];
+
+      if (isDeleting) {
+        typedElement.textContent = currentText.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        typedElement.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
+      }
+
+      let speed = isDeleting ? 50 : 100;
+
+      if (!isDeleting && charIndex === currentText.length) {
+        speed = 2000; // Pause at end
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        textIndex = (textIndex + 1) % texts.length;
+        speed = 500; // Pause before next text
+      }
+
+      setTimeout(typeAnimation, speed);
+    }
+
+    // Start typing animation
+    setTimeout(typeAnimation, 1000);
+
+    // Set last modified date
+   // document.getElementById('lasttime').textContent = new Date().toLocaleDateString();
+
+    // Console easter egg
+    console.log(`
     ╔══════════════════════════════════════╗
     ║         Welcome to my website!       ║
     ║                                      ║
@@ -240,6 +275,7 @@
     ║  - Tanjilur Rahman                   ║
     ╚══════════════════════════════════════╝
         `);
-    </script>
+  </script>
 </body>
+
 </html>
