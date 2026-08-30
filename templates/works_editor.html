@@ -141,7 +141,7 @@
           <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p class="text-xs uppercase tracking-[0.35em] text-white/45">Current Works</p>
-              <h3 class="mt-2 text-2xl font-bold">Published project records</h3>
+              <h3 class="mt-2 text-2xl font-bold">All project records</h3>
             </div>
             <p class="text-sm text-white/50">{{ work_items | length }} projects</p>
           </div>
@@ -151,7 +151,7 @@
                 <div class="min-w-0">
                   <div class="flex items-center gap-3">
                     <span class="rounded-full bg-white/10 px-3 py-1 text-xs text-white/55">{{ work_item.number }}</span>
-                    <span class="text-xs uppercase tracking-[0.25em] text-white/45">{{ 'Active' if work_item.is_active else 'Hidden' }}</span>
+                    <span class="text-xs uppercase tracking-[0.25em] {% if work_item.is_active %}text-emerald-300{% else %}text-amber-300{% endif %}">{{ 'Published' if work_item.is_active else 'Draft' }}</span>
                   </div>
                   <h4 class="mt-4 text-xl font-bold">{{ work_item.title }}</h4>
                   <p class="mt-2 break-all text-sm text-white/50">/works/{{ work_item.slug }}</p>
@@ -159,7 +159,14 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                   <a href="{{ url_for('works_editor', work_id=work_item.id) }}" class="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:bg-amber-200">Edit</a>
-                  <a href="{{ url_for('project_detail', slug=work_item.slug) }}" target="_blank" class="rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black">View page</a>
+                  {% if work_item.is_active %}
+                    <a href="{{ url_for('project_detail', slug=work_item.slug) }}" target="_blank" class="rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black">View page</a>
+                  {% endif %}
+                  <form method="post" action="{{ url_for('toggle_work_publish', project_id=work_item.id) }}">
+                    <button type="submit" class="rounded-full border px-4 py-2 text-sm font-semibold transition {% if work_item.is_active %}border-rose-400/35 text-rose-200 hover:bg-rose-400 hover:text-black{% else %}border-emerald-400/35 text-emerald-200 hover:bg-emerald-400 hover:text-black{% endif %}">
+                      {{ 'Unpublish' if work_item.is_active else 'Publish' }}
+                    </button>
+                  </form>
                 </div>
               </article>
             {% endfor %}

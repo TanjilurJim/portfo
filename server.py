@@ -1789,6 +1789,37 @@ def works_editor():
     )
 
 
+@app.route('/dashboard/works/<int:project_id>/toggle-publish', methods=['POST'])
+@login_required
+def toggle_work_publish(project_id):
+    if not is_admin_user():
+        flash('Only the admin account can publish Works content.', 'error')
+        return redirect(url_for('dashboard'))
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        row = conn.execute(
+            'SELECT title, is_active FROM about_projects WHERE id = ?',
+            (project_id,),
+        ).fetchone()
+        if not row:
+            flash('Work item not found.', 'error')
+            return redirect(url_for('works_editor'))
+
+        new_status = 0 if row[1] else 1
+        conn.execute(
+            """
+            UPDATE about_projects
+            SET is_active = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (new_status, project_id),
+        )
+
+    action = 'published' if new_status else 'unpublished'
+    flash(f'{row[0]} {action} successfully.', 'success')
+    return redirect(url_for('works_editor'))
+
+
 @app.route('/dashboard/smtp-settings', methods=['GET', 'POST'])
 @login_required
 def smtp_settings():
