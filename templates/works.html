@@ -13,139 +13,497 @@
   <link href="{{ url_for('static', filename='main.3f6952e4.css') }}" rel="stylesheet">
   <title>Works</title>
   <style>
-    body {
-      background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-      font-family: 'Manrope', sans-serif;
+    :root {
+      --ink: #10100f;
+      --paper: #f4f1ea;
+      --acid: #d9ff67;
+      --muted: #77776f;
+      --line: rgba(16, 16, 15, 0.14);
     }
 
-    .soft-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.5rem 0.85rem;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.04);
-      color: #0f172a;
-      font-size: 0.78rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 700;
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 0;
+      overflow-x: hidden;
+      background:
+        linear-gradient(rgba(16, 16, 15, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 16, 15, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 42px 42px;
+      font-family: 'Manrope', sans-serif;
+      color: var(--ink);
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    .deck-viewport:focus-visible {
+      outline: 3px solid var(--acid);
+      outline-offset: 4px;
     }
 
     .works-shell {
-      padding: 132px 0 90px;
+      padding: 138px 0 100px;
     }
 
     .works-copy {
-      color: #334155;
+      color: #55554f;
       line-height: 1.9;
       font-size: 18px;
       font-weight: 500;
     }
 
-    .carousel-control {
-      background-image: none !important;
-      width: 5%;
-      color: #0f172a !important;
-      opacity: 1;
-      text-shadow: none;
+    .works-heading {
+      color: var(--ink);
+      font-size: clamp(42px, 7vw, 82px) !important;
+      line-height: 0.98;
+      letter-spacing: -0.065em;
     }
 
-    .carousel-control .glyphicon-chevron-left,
-    .carousel-control .glyphicon-chevron-right {
-      font-size: 28px;
-      margin-top: -14px;
-    }
-
-    .carousel-card {
-      border-radius: 28px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
-      height: 100%;
-    }
-
-    .carousel-media {
-      height: 240px;
-      background-size: cover;
-      background-position: center;
+    .portfolio-deck {
       position: relative;
-      display: block;
+      margin-top: 10px;
+      border: 1px solid rgba(16, 16, 15, 0.85);
+      border-radius: 34px;
+      overflow: hidden;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 30px 80px rgba(16, 16, 15, 0.18);
     }
 
-    .carousel-media::after {
+    .deck-toolbar {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 18px 22px 18px 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .deck-kicker {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 11px;
+      line-height: 1.4;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .deck-status {
+      min-width: 82px;
+      margin-right: 6px;
+      color: rgba(255, 255, 255, 0.72);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-align: right;
+    }
+
+    .deck-button {
+      width: 46px;
+      height: 46px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .deck-button:hover {
+      background: var(--acid);
+      color: var(--ink);
+      transform: translateY(-2px);
+    }
+
+    .deck-viewport {
+      width: 100%;
+      overflow: hidden;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+
+    .deck-viewport.is-dragging {
+      cursor: grabbing;
+    }
+
+    .deck-track {
+      display: flex;
+      will-change: transform;
+      transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .deck-viewport.is-dragging .deck-track {
+      transition: none;
+    }
+
+    .work-slide {
+      min-width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.28fr) minmax(340px, 0.72fr);
+      min-height: 590px;
+    }
+
+    .work-visual {
+      position: relative;
+      min-height: 590px;
+      display: block;
+      overflow: hidden;
+      background: #252522;
+    }
+
+    .work-visual::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.34));
+      background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.62));
+      pointer-events: none;
     }
 
-    .carousel-body {
-      padding: 24px;
+    .work-visual img {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.015);
+      transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 400ms ease;
     }
 
-    .work-number {
-      color: #64748b;
-      letter-spacing: 0.2em;
+    .work-visual:hover img {
+      transform: scale(1.055);
+      filter: saturate(1.08);
+    }
+
+    .visual-label {
+      position: absolute;
+      z-index: 2;
+      left: 28px;
+      bottom: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 11px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      font-size: 12px;
       font-weight: 700;
     }
 
-    .work-title {
-      font-size: 30px;
-      line-height: 1.05;
-      margin: 12px 0 10px;
-      letter-spacing: -0.04em;
+    .visual-label::before {
+      content: "";
+      width: 30px;
+      height: 1px;
+      background: var(--acid);
+    }
+
+    .work-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(34px, 5vw, 68px);
+      border-left: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .work-number {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--acid);
+      color: var(--ink);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 10px;
       font-weight: 800;
-      color: #0f172a;
+    }
+
+    .work-title {
+      max-width: 9ch;
+      margin: 24px 0 18px;
+      color: #fff;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      font-weight: 800;
     }
 
     .work-summary {
-      color: #475569;
-      font-size: 16px;
-      line-height: 1.85;
+      max-width: 42ch;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 15px;
+      line-height: 1.75;
       font-weight: 500;
     }
 
     .tag-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin: 18px 0 0;
+      gap: 8px;
+      margin: 24px 0 0;
     }
 
     .tag {
       display: inline-flex;
       align-items: center;
-      padding: 0.4rem 0.75rem;
+      padding: 7px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.05);
-      color: #0f172a;
-      font-size: 12px;
-      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 10px;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       font-weight: 700;
     }
 
-    .slide-row {
+    .work-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 24px 0;
+      gap: 10px;
+      margin-top: 32px;
     }
 
-    .slide-row > div {
-      margin-bottom: 24px;
+    .work-link {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .work-link:hover,
+    .work-link:focus {
+      border-color: #fff;
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .work-link.primary {
+      border-color: var(--acid);
+      background: var(--acid);
+      color: var(--ink);
+    }
+
+    .work-link.primary:hover,
+    .work-link.primary:focus {
+      border-color: #fff;
+      background: #fff;
+    }
+
+    .deck-footer {
+      min-height: 66px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 0 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .deck-progress {
+      height: 2px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .deck-progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--acid);
+      transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .deck-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .deck-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.28);
+      transition: width 220ms ease, border-radius 220ms ease, background 220ms ease;
+    }
+
+    .deck-dot.is-active {
+      width: 25px;
+      border-radius: 999px;
+      background: var(--acid);
+    }
+
+    .empty-works {
+      padding: 70px 30px;
+      color: rgba(255, 255, 255, 0.68);
+      text-align: center;
     }
 
     @media (max-width: 991px) {
       .works-shell {
-        padding-top: 110px;
+        padding: 118px 0 78px;
+      }
+
+      .work-slide {
+        grid-template-columns: 1fr;
+        min-height: 0;
+      }
+
+      .work-visual {
+        min-height: min(54vw, 480px);
+      }
+
+      .work-content {
+        min-height: 430px;
+        border-top: 1px solid rgba(255, 255, 255, 0.14);
+        border-left: 0;
       }
 
       .work-title {
-        font-size: 26px;
+        max-width: 14ch;
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        background-size: 28px 28px;
+      }
+
+      .works-shell {
+        padding: 96px 0 56px;
+      }
+
+      .works-shell .container {
+        width: 100%;
+        padding-right: 18px;
+        padding-left: 18px;
+      }
+
+      .section-container-spacer {
+        margin-bottom: 32px;
+      }
+
+      .works-heading {
+        font-size: clamp(40px, 14vw, 62px) !important;
+      }
+
+      .portfolio-deck {
+        border-radius: 24px;
+      }
+
+      .deck-toolbar {
+        min-height: 70px;
+        padding: 12px 14px 12px 18px;
+      }
+
+      .deck-kicker {
+        letter-spacing: 0.18em;
+      }
+
+      .deck-status {
+        display: none;
+      }
+
+      .deck-button {
+        width: 42px;
+        height: 42px;
+      }
+
+      .work-visual {
+        min-height: 260px;
+      }
+
+      .visual-label {
+        left: 20px;
+        bottom: 18px;
+      }
+
+      .work-content {
+        min-height: 0;
+        justify-content: flex-start;
+        padding: 30px 22px 34px;
+      }
+
+      .work-title {
+        margin-top: 20px;
+        font-size: clamp(34px, 11vw, 48px);
+      }
+
+      .work-summary {
+        font-size: 14px;
+      }
+
+      .work-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .work-actions .work-link:only-child {
+        grid-column: 1 / -1;
+      }
+
+      .deck-footer {
+        min-height: 58px;
+        padding: 0 18px;
+      }
+
+      .deck-dots {
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .deck-kicker {
+        max-width: 110px;
+      }
+
+      .work-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .work-actions .work-link {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
       }
     }
   </style>
@@ -181,50 +539,68 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10 col-sm-offset-1 text-center section-container-spacer">
-        <div class="soft-pill" style="display: inline-flex; margin-bottom: 16px;">02 : Works</div>
-        <h1 class="h2" style="font-size: 58px; margin-top: 0;">Selected case studies</h1>
+
+        <h1 class="h2 works-heading" style="font-size: 58px; margin-top: 0;">Some of my works</h1>
         <p class="works-copy" style="max-width: 820px; margin: 0 auto;">
-          A carousel of projects pulled from SQLite. Use the dashboard to add or update a work item, and the Discover button will open the separate detail page for that project.
+
         </p>
       </div>
     </div>
 
-    <div id="portfolioCarousel" class="carousel slide" data-ride="carousel">
-      <div class="carousel-inner">
-        {% for group in work_groups %}
-          <div class="item {% if loop.first %}active{% endif %}">
-            <div class="row slide-row">
-              {% for work in group %}
-                <div class="col-sm-4">
-                  <article class="carousel-card">
-                    <a href="{{ url_for('project_detail', slug=work.slug) }}" class="carousel-media" style="background-image: url('{{ work.cover_image }}');"></a>
-                    <div class="carousel-body">
-                      <div class="work-number">{{ work.number }}</div>
-                      <h3 class="work-title">{{ work.title }}</h3>
-                      <p class="work-summary">{{ work.summary }}</p>
-                      <div class="tag-row">
-                        {% for stack_item in work.stack %}
-                          <span class="tag">{{ stack_item }}</span>
-                        {% endfor %}
-                      </div>
-                      <div style="margin-top: 22px;">
-                        <a href="{{ url_for('project_detail', slug=work.slug) }}" class="btn btn-default">Discover</a>
-                        <a href="{{ work.live_url }}" class="btn btn-default" target="_blank" rel="noopener">Live site</a>
-                      </div>
-                    </div>
-                  </article>
-                </div>
-              {% endfor %}
-            </div>
+    <section class="portfolio-deck" aria-label="Portfolio projects">
+      {% if work_items %}
+        <div class="deck-toolbar">
+          <p class="deck-kicker">Selected work / swipe to explore</p>
+          <div class="deck-controls">
+            <span class="deck-status" id="deckStatus" aria-live="polite">01 / {{ '%02d'|format(work_items|length) }}</span>
+            <button class="deck-button" id="deckPrevious" type="button" aria-label="Previous project">&#8592;</button>
+            <button class="deck-button" id="deckNext" type="button" aria-label="Next project">&#8594;</button>
           </div>
-        {% endfor %}
-      </div>
+        </div>
 
-      {% if work_groups|length > 1 %}
-        <a class="left carousel-control" href="#portfolioCarousel" data-slide="prev">&lsaquo;</a>
-        <a class="right carousel-control" href="#portfolioCarousel" data-slide="next">&rsaquo;</a>
+        <div class="deck-viewport" id="deckViewport" tabindex="0" aria-roledescription="carousel">
+          <div class="deck-track" id="deckTrack">
+            {% for work in work_items %}
+              <article class="work-slide" aria-label="{{ loop.index }} of {{ work_items|length }}: {{ work.title }}">
+                <a href="{{ url_for('project_detail', slug=work.slug) }}" class="work-visual" tabindex="-1">
+                  <img src="{{ work.cover_image }}" alt="{{ work.title }} project preview" loading="{% if loop.first %}eager{% else %}lazy{% endif %}">
+                  <span class="visual-label">Open case study</span>
+                </a>
+                <div class="work-content">
+                  <span class="work-number">Project {{ work.number }}</span>
+                  <h2 class="work-title">{{ work.title }}</h2>
+                  <p class="work-summary">{{ work.summary }}</p>
+                  <div class="tag-row" aria-label="Technologies used">
+                    {% for stack_item in work.stack %}
+                      <span class="tag">{{ stack_item }}</span>
+                    {% endfor %}
+                  </div>
+                  <div class="work-actions">
+                    <a href="{{ url_for('project_detail', slug=work.slug) }}" class="work-link primary">Discover project</a>
+                    {% if work.live_url %}
+                      <a href="{{ work.live_url }}" class="work-link" target="_blank" rel="noopener">Visit live site &#8599;</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="deck-footer">
+          <div class="deck-progress" aria-hidden="true">
+            <div class="deck-progress-bar" id="deckProgress"></div>
+          </div>
+          <div class="deck-dots" id="deckDots" aria-label="Choose a project">
+            {% for work in work_items %}
+              <button type="button" class="deck-dot {% if loop.first %}is-active{% endif %}" data-slide-index="{{ loop.index0 }}" aria-label="Show {{ work.title }}" {% if loop.first %}aria-current="true"{% endif %}></button>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-works">No published projects yet.</div>
       {% endif %}
-    </div>
+    </section>
   </div>
 </main>
 
@@ -243,6 +619,129 @@
     if (typeof navActivePage === "function") {
       navActivePage();
     }
+
+    const viewport = document.getElementById("deckViewport");
+    const track = document.getElementById("deckTrack");
+    if (!viewport || !track) {
+      return;
+    }
+
+    const slides = Array.from(track.querySelectorAll(".work-slide"));
+    const dots = Array.from(document.querySelectorAll(".deck-dot"));
+    const previousButton = document.getElementById("deckPrevious");
+    const nextButton = document.getElementById("deckNext");
+    const status = document.getElementById("deckStatus");
+    const progress = document.getElementById("deckProgress");
+    const total = slides.length;
+    let currentIndex = 0;
+    let pointerStart = 0;
+    let dragDistance = 0;
+    let isDragging = false;
+    let blockClick = false;
+
+    const formatNumber = (number) => String(number).padStart(2, "0");
+
+    function renderDeck(animate = true) {
+      track.style.transition = animate ? "" : "none";
+      track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+      status.textContent = `${formatNumber(currentIndex + 1)} / ${formatNumber(total)}`;
+      progress.style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+      slides.forEach((slide, index) => {
+        const isCurrent = index === currentIndex;
+        slide.setAttribute("aria-hidden", String(!isCurrent));
+        slide.querySelectorAll("a, button").forEach((control) => {
+          control.tabIndex = isCurrent ? 0 : -1;
+        });
+      });
+
+      dots.forEach((dot, index) => {
+        const isCurrent = index === currentIndex;
+        dot.classList.toggle("is-active", isCurrent);
+        if (isCurrent) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    function goToSlide(index) {
+      currentIndex = (index + total) % total;
+      renderDeck();
+    }
+
+    previousButton.addEventListener("click", () => goToSlide(currentIndex - 1));
+    nextButton.addEventListener("click", () => goToSlide(currentIndex + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slideIndex)));
+    });
+
+    viewport.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        goToSlide(currentIndex - 1);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        goToSlide(currentIndex + 1);
+      }
+    });
+
+    viewport.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+      isDragging = true;
+      blockClick = false;
+      pointerStart = event.clientX;
+      dragDistance = 0;
+      viewport.classList.add("is-dragging");
+      viewport.setPointerCapture(event.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", (event) => {
+      if (!isDragging) {
+        return;
+      }
+      dragDistance = event.clientX - pointerStart;
+      if (Math.abs(dragDistance) > 8) {
+        blockClick = true;
+      }
+      track.style.transform = `translate3d(calc(-${currentIndex * 100}% + ${dragDistance}px), 0, 0)`;
+    });
+
+    function finishDrag(event) {
+      if (!isDragging) {
+        return;
+      }
+      isDragging = false;
+      viewport.classList.remove("is-dragging");
+      if (viewport.hasPointerCapture(event.pointerId)) {
+        viewport.releasePointerCapture(event.pointerId);
+      }
+
+      const threshold = Math.min(100, viewport.clientWidth * 0.16);
+      if (dragDistance <= -threshold) {
+        goToSlide(currentIndex + 1);
+      } else if (dragDistance >= threshold) {
+        goToSlide(currentIndex - 1);
+      } else {
+        renderDeck();
+      }
+    }
+
+    viewport.addEventListener("pointerup", finishDrag);
+    viewport.addEventListener("pointercancel", finishDrag);
+    viewport.addEventListener("click", (event) => {
+      if (blockClick) {
+        event.preventDefault();
+        blockClick = false;
+      }
+    }, true);
+    window.addEventListener("resize", () => renderDeck(false));
+
+    renderDeck(false);
   });
 </script>
 <script type="text/javascript" src="{{ url_for('static', filename='main.70a66962.js') }}"></script>
