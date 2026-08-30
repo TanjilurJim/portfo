@@ -1,0 +1,5 @@
+portfolio.db
+portfolio.db-*
+__pycache__/
+*.pyc
+.env
