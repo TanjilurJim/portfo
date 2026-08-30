@@ -59,7 +59,7 @@
           
           <div class="row">
             <div class="col-md-10 col-md-offset-1">
-               <form action="submit_form" method="post"class="reveal-content">
+               <form id="contact-form" action="/submit_form" method="post" class="reveal-content">
                   <div class="row">
                     <div class="col-md-7">
                       <div class="form-group">
@@ -71,7 +71,10 @@
                       <div class="form-group">
                         <textarea name="message"class="form-control" rows="5" placeholder="Enter your message"></textarea>
                       </div>
-                      <button type="submit" class="btn btn-default btn-lg">Send</button>
+                      <button type="submit" id="contact-submit-btn" class="btn btn-default btn-lg">
+                        <span>Send</span>
+                        <span id="contact-submit-loader" style="display:none; margin-left:8px; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; vertical-align:middle; animation: contact-spin 0.8s linear infinite;"></span>
+                      </button>
                     </div>
                     <div class="col-md-5 address-c ontainer">
                       <ul class="list-unstyled">
@@ -133,8 +136,27 @@
 <script>
   document.addEventListener("DOMContentLoaded", function (event) {
      navActivePage();
+
+     const contactForm = document.getElementById("contact-form");
+     const contactSubmitBtn = document.getElementById("contact-submit-btn");
+     const contactSubmitLoader = document.getElementById("contact-submit-loader");
+
+     if (contactForm && contactSubmitBtn && contactSubmitLoader) {
+       contactForm.addEventListener("submit", function () {
+         contactSubmitBtn.disabled = true;
+         contactSubmitLoader.style.display = "inline-block";
+         contactSubmitBtn.querySelector("span").textContent = "Sending...";
+       });
+     }
   });
 </script>
+
+<style>
+  @keyframes contact-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID 
 

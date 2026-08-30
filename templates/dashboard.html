@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" />
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Roboto Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: "Roboto Mono", monospace;
+    }
+  </style>
+</head>
+<body class="min-h-dvh bg-stone-950 text-white font-mono overflow-x-hidden">
+  <div class="min-h-dvh lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
+    <aside class="border-b border-white/10 bg-black/25 lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r lg:border-white/10">
+      <div class="flex h-full flex-col p-6 sm:p-8">
+        <div class="mb-8">
+          <p class="text-xs uppercase tracking-[0.4em] text-white/45">Private Area</p>
+          <h1 class="mt-3 text-3xl font-bold">Dashboard</h1>
+          <p class="mt-2 text-sm text-white/60">
+            Signed in as {{ current_user.display_name }}
+          </p>
+        </div>
+
+        <nav class="space-y-3">
+          <a href="{{ url_for('dashboard') }}" class="flex items-center justify-between rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+            <span>Overview</span>
+            <span class="text-xs opacity-70">01</span>
+          </a>
+          {% if is_admin_user %}
+            <a href="{{ url_for('contacts') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+              <span>Contacts</span>
+              <span class="text-xs opacity-70">02</span>
+            </a>
+            <a href="{{ url_for('smtp_settings') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+              <span>SMTP Settings</span>
+              <span class="text-xs opacity-70">03</span>
+            </a>
+            <a href="{{ url_for('about_editor') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+              <span>About Content</span>
+              <span class="text-xs opacity-70">04</span>
+            </a>
+            <a href="{{ url_for('works_editor') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+              <span>Works Content</span>
+              <span class="text-xs opacity-70">05</span>
+            </a>
+          {% endif %}
+          <a href="{{ url_for('expenses') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+            <span>Expense Tracker</span>
+            <span class="text-xs opacity-70">{% if is_admin_user %}06{% else %}02{% endif %}</span>
+          </a>
+          <a href="{{ url_for('logout') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
+            <span>Log out</span>
+            <span class="text-xs opacity-70">{% if is_admin_user %}07{% else %}03{% endif %}</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="min-w-0 p-5 sm:p-8 lg:p-10">
+      <div class="max-w-5xl">
+        <div class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+          <a href="{{ url_for('dashboard') }}" class="whitespace-nowrap rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm">Overview</a>
+          {% if is_admin_user %}
+            <a href="{{ url_for('contacts') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Contacts</a>
+            <a href="{{ url_for('smtp_settings') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">SMTP</a>
+            <a href="{{ url_for('about_editor') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">About</a>
+            <a href="{{ url_for('works_editor') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Works</a>
+          {% endif %}
+          <a href="{{ url_for('expenses') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Expenses</a>
+          <a href="{{ url_for('logout') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Logout</a>
+        </div>
+
+        <div class="mb-8 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_16px_60px_rgba(0,0,0,0.25)]">
+          <p class="text-xs uppercase tracking-[0.4em] text-white/45">Overview</p>
+          <h2 class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold">
+            Welcome, {{ current_user.display_name }}
+          </h2>
+          <p class="mt-4 max-w-2xl text-white/70 leading-relaxed">
+            This private area is where you can manage your portfolio settings.
+            Use the sidebar to open SMTP settings and update your mail server values.
+          </p>
+        </div>
+
+        <div class="mb-8 grid gap-4 sm:grid-cols-3">
+          <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5 shadow-lg shadow-emerald-950/20">
+            <p class="text-sm text-emerald-200">This month earned</p>
+            <p class="mt-3 text-3xl font-bold text-white">{{ '%.2f'|format(expense_data.current_user_income or 0) }}</p>
+          </div>
+          <div class="rounded-3xl border border-rose-400/20 bg-gradient-to-br from-rose-500/20 to-rose-500/5 p-5 shadow-lg shadow-rose-950/20">
+            <p class="text-sm text-rose-200">This month spent</p>
+            <p class="mt-3 text-3xl font-bold text-white">{{ '%.2f'|format(expense_data.current_user_expense or 0) }}</p>
+          </div>
+          <div class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-500/20 to-sky-500/5 p-5 shadow-lg shadow-sky-950/20">
+            <p class="text-sm text-sky-200">This month net</p>
+            <p class="mt-3 text-3xl font-bold text-white">{{ '%.2f'|format(expense_data.current_user_balance or 0) }}</p>
+          </div>
+        </div>
+
+        {% if is_admin_user %}
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-5">
+              <p class="text-sm text-white/50">Logged in as</p>
+              <p class="mt-2 text-lg">{{ current_user.username }}</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-5">
+              <p class="text-sm text-white/50">Database</p>
+              <p class="mt-2 text-lg">portfolio.db</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-amber-500/15 to-white/5 p-5">
+              <p class="text-sm text-white/50">Contacts</p>
+              <p class="mt-2 text-lg">{{ contact_totals.total_contacts or 0 }} received</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/20 to-white/5 p-5">
+              <p class="text-sm text-white/50">Unread</p>
+              <p class="mt-2 text-lg">{{ contact_totals.unread_contacts or 0 }}</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-white/5 p-5">
+              <p class="text-sm text-white/50">Owner mail</p>
+              <p class="mt-2 text-lg">{{ contact_totals.owner_notifications_sent or 0 }} sent</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-sky-500/20 to-white/5 p-5">
+              <p class="text-sm text-white/50">Auto replies</p>
+              <p class="mt-2 text-lg">{{ contact_totals.auto_replies_sent or 0 }} sent</p>
+            </div>
+          </div>
+
+          <div class="mt-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-6 sm:p-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-white/50">About page</p>
+                <h3 class="mt-2 text-2xl font-semibold">Manage About content</h3>
+                <p class="mt-2 text-white/70">
+                  Edit the profile, story, labels, resume, and section text on a dedicated page.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <a
+                  href="{{ url_for('about_editor') }}"
+                  class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-transparent hover:text-white"
+                >
+                  Edit About Page
+                </a>
+                <a
+                  href="{{ url_for('works_editor') }}"
+                  class="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white hover:text-black"
+                >
+                  Manage Works
+                </a>
+                <a
+                  href="{{ url_for('smtp_settings') }}"
+                  class="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold transition-colors hover:bg-white hover:text-black"
+                >
+                  SMTP Settings
+                </a>
+                <a
+                  href="{{ url_for('contacts') }}"
+                  class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-transparent hover:text-white"
+                >
+                  Contacts
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-white/50">Money tracker</p>
+              <h3 class="mt-2 text-2xl font-semibold">Track expenses and income</h3>
+              <p class="mt-2 text-white/70">
+                See your own totals here, while the other person keeps a separate ledger.
+              </p>
+            </div>
+            <a
+              href="{{ url_for('expenses') }}"
+              class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-transparent hover:text-white"
+            >
+              Open Expense Tracker
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>
