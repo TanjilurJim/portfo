@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Single+Day&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
@@ -86,6 +87,34 @@
       margin-bottom: 12px;
       font-size: 24px;
       font-weight: 800;
+    }
+
+    .lift-card {
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transform-origin: center;
+      transition: box-shadow 240ms ease, border-color 240ms ease, background 240ms ease;
+      will-change: transform;
+    }
+
+    .lift-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
+      opacity: 0;
+      transition: opacity 240ms ease;
+      pointer-events: none;
+    }
+
+    .lift-card:hover {
+      border-color: rgba(15, 23, 42, 0.14);
+      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.12);
+    }
+
+    .lift-card:hover::after {
+      opacity: 1;
     }
 
     .skill-icon {
@@ -164,6 +193,76 @@
       border: 1px solid rgba(15, 23, 42, 0.08);
     }
 
+    .snapshot-panel {
+      position: relative;
+    }
+
+    .snapshot-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+
+    .snapshot-field {
+      min-width: 0;
+    }
+
+    .snapshot-label {
+      margin: 0;
+      color: #64748b;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700;
+    }
+
+    .snapshot-value {
+      position: relative;
+      display: inline-block;
+      margin: 8px 0 0;
+      color: #0f172a;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 18px;
+      line-height: 1.55;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+    }
+
+    .snapshot-value.is-decoding {
+      color: #111827;
+      text-shadow: -1px 0 rgba(14, 165, 233, 0.45), 1px 0 rgba(249, 115, 22, 0.40);
+    }
+
+    .hero-decode {
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-decode.is-decoding {
+      text-shadow: -2px 0 rgba(14, 165, 233, 0.52), 2px 0 rgba(249, 115, 22, 0.48);
+    }
+
+    .snapshot-value.is-decoding::after {
+      content: "_";
+      position: absolute;
+      margin-left: 3px;
+      color: #f97316;
+      animation: decode-cursor 320ms steps(1, end) infinite;
+    }
+
+    @keyframes decode-cursor {
+      50% { opacity: 0; }
+    }
+
+    .snapshot-note {
+      margin-top: 22px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
     .text-strong {
       color: #0f172a;
       font-weight: 700;
@@ -235,7 +334,7 @@
             </div>
 
             <!-- <div class="soft-pill section-label" style="margin-bottom: 16px;">{{ about_data.intro_label }}</div> -->
-            <h2 style="margin-top: 0; font-size: 56px;">{{ about_data.intro_heading }}</h2>
+            <h2 class="hero-decode js-hero-decode" data-decode-text="{{ about_data.intro_heading|e }}" style="margin-top: 0; font-size: 56px;">{{ about_data.intro_heading }}</h2>
             <p class="about-copy">
               {{ about_data.intro_text }}
             </p>
@@ -247,15 +346,15 @@
 
             <div class="row" style="margin-top: 24px;">
               <div class="col-xs-12 col-sm-6">
-                <div class="glass-card js-viewport-reveal" style="padding: 16px; border-radius: 18px; margin-bottom: 16px;">
+                <div class="glass-card lift-card js-viewport-reveal" style="padding: 16px; border-radius: 18px; margin-bottom: 16px;">
                   <div class="soft-pill section-label" style="margin-bottom: 10px;">{{ about_data.focus_label }}</div>
-                  <p class="about-copy" style="margin: 0;">{{ about_data.focus_text }}</p>
+                  <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ about_data.focus_text }}</p>
                 </div>
               </div>
               <div class="col-xs-12 col-sm-6">
-                <div class="glass-card js-viewport-reveal" style="padding: 16px; border-radius: 18px; margin-bottom: 16px;">
+                <div class="glass-card lift-card js-viewport-reveal" style="padding: 16px; border-radius: 18px; margin-bottom: 16px;">
                   <div class="soft-pill section-label" style="margin-bottom: 10px;">{{ about_data.current_label }}</div>
-                  <p class="about-copy" style="margin: 0;">{{ about_data.current_text }}</p>
+                  <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ about_data.current_text }}</p>
                 </div>
               </div>
             </div>
@@ -274,24 +373,24 @@
         </div>
 
         <div class="col-xs-12 col-md-6 js-intro">
-          <div class="glass-card js-hero-image-card" style="border-radius: 30px; overflow: hidden; position: sticky; top: 110px;">
+          <div class="glass-card lift-card js-hero-image-card snapshot-panel" style="border-radius: 30px; overflow: hidden; position: sticky; top: 110px;">
             <a href="{{ about_data.portrait_image }}" data-lightbox="image-group" data-title="Image 2">
               <img src="{{ about_data.portrait_image }}" class="img-responsive image-zoom js-parallax-image" alt="Jim portrait">
             </a>
             <div style="padding: 24px;">
               <div class="soft-pill" style="margin-bottom: 14px;">Quick snapshot</div>
-              <div class="row">
-                <div class="col-xs-6">
-                  <p style="margin: 0; color: #64748b; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;">{{ about_data.quick_role_label }}</p>
-                  <p style="margin-top: 8px; font-family: 'Abel', sans-serif; font-size: 18px;">{{ about_data.quick_role_value }}</p>
+              <div class="snapshot-grid">
+                <div class="snapshot-field">
+                  <p class="snapshot-label">{{ about_data.quick_role_label }}</p>
+                  <p class="snapshot-value js-decode-text" data-decode-text="{{ about_data.quick_role_value|e }}">{{ about_data.quick_role_value }}</p>
                 </div>
-                <div class="col-xs-6">
-                  <p style="margin: 0; color: #64748b; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;">{{ about_data.quick_home_label }}</p>
-                  <p style="margin-top: 8px; font-family: 'Abel', sans-serif; font-size: 18px;">{{ about_data.quick_home_value }}</p>
+                <div class="snapshot-field">
+                  <p class="snapshot-label">{{ about_data.quick_home_label }}</p>
+                  <p class="snapshot-value js-decode-text" data-decode-text="{{ about_data.quick_home_value|e }}">{{ about_data.quick_home_value }}</p>
                 </div>
               </div>
-              <div style="margin-top: 22px; padding-top: 22px; border-top: 1px solid rgba(15, 23, 42, 0.08);">
-                <p class="about-copy" style="margin: 0;">{{ about_data.quick_note }}</p>
+              <div class="snapshot-note">
+                <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ about_data.quick_note }}</p>
               </div>
             </div>
           </div>
@@ -309,10 +408,10 @@
                   <div class="timeline-icon">
                     <i class="{{ item.icon_class }}"></i>
                   </div>
-                  <div class="timeline-card">
+                  <div class="timeline-card lift-card">
                     <div class="soft-pill section-label" style="margin-bottom: 10px;">0{{ loop.index }}</div>
                     <h4 style="margin-bottom: 8px;">{{ item.title }}</h4>
-                    <p class="about-copy" style="margin: 0;">{{ item.description }}</p>
+                    <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ item.description }}</p>
                   </div>
                 </div>
               {% endfor %}
@@ -328,13 +427,13 @@
             <p class="about-copy" style="max-width: 760px; margin-bottom: 20px;">{{ about_data.skills_intro }}</p>
             <div class="horizontal-track">
               {% for skill in about_data.skill_items %}
-                <article class="track-card js-track-card">
+                <article class="track-card lift-card js-track-card">
                   <div class="skill-icon">
                     <i class="{{ skill.icon_class }}"></i>
                   </div>
                   <!-- <div class="soft-pill section-label" style="margin-bottom: 14px;">{{ skill.accent|upper }}</div> -->
                   <h4 style="margin-bottom: 8px;">{{ skill.title }}</h4>
-                  <p class="about-copy" style="margin: 0;">{{ skill.description }}</p>
+                  <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ skill.description }}</p>
                 </article>
               {% endfor %}
             </div>
@@ -349,10 +448,10 @@
             <p class="about-copy" style="max-width: 760px; margin-bottom: 20px;">{{ about_data.projects_intro }}</p>
             <div class="horizontal-track">
               {% for project in about_data.project_items %}
-                <article class="track-card js-track-card">
+                <article class="track-card lift-card js-track-card">
                   <div class="soft-pill section-label" style="margin-bottom: 14px;">{{ project.accent|upper }}</div>
                   <h4 style="margin-bottom: 8px;">{{ project.title }}</h4>
-                  <p class="about-copy" style="margin-bottom: 18px;">{{ project.description }}</p>
+                  <p class="about-copy" style="margin-bottom: 18px; font-size: 17px; line-height: 1.85;">{{ project.description }}</p>
                   <a href="{{ project.link_url }}" class="btn btn-default">{{ project.link_label }}</a>
                 </article>
               {% endfor %}
@@ -440,6 +539,107 @@
             end: "bottom top",
             scrub: true,
           },
+        });
+      }
+
+      const decodeCharacters = "01#$%&?*+<>[]{}";
+      const decodeTargets = gsap.utils.toArray(".js-decode-text");
+
+      const renderScrambledText = function (element, finalText, resolvedCount) {
+        element.textContent = Array.from(finalText).map(function (character, index) {
+          if (character === " " || index < resolvedCount) {
+            return character;
+          }
+
+          return decodeCharacters[Math.floor(Math.random() * decodeCharacters.length)];
+        }).join("");
+      };
+
+      const animateDecodedText = function (element, duration, delay) {
+        const finalText = element.dataset.decodeText || element.textContent.trim();
+        const progress = { resolved: 0 };
+
+        element.setAttribute("aria-label", finalText);
+        element.classList.add("is-decoding");
+        renderScrambledText(element, finalText, 0);
+
+        gsap.to(progress, {
+          resolved: finalText.length,
+          duration: duration,
+          delay: delay || 0,
+          ease: "none",
+          snap: { resolved: 1 },
+          onUpdate: function () {
+            renderScrambledText(element, finalText, progress.resolved);
+          },
+          onComplete: function () {
+            element.textContent = finalText;
+            element.classList.remove("is-decoding");
+          },
+        });
+      };
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const heroDecode = document.querySelector(".js-hero-decode");
+
+      if (heroDecode && !reducedMotion) {
+        ScrollTrigger.create({
+          trigger: heroDecode,
+          start: "top 92%",
+          once: true,
+          onEnter: function () {
+            animateDecodedText(heroDecode, 1.5, 0.35);
+          },
+        });
+      }
+
+      if (decodeTargets.length && !reducedMotion) {
+        decodeTargets.forEach(function (element) {
+          const finalText = element.dataset.decodeText || element.textContent.trim();
+          element.setAttribute("aria-label", finalText);
+          element.classList.add("is-decoding");
+          renderScrambledText(element, finalText, 0);
+        });
+
+        ScrollTrigger.create({
+          trigger: ".snapshot-grid",
+          start: "top 88%",
+          once: true,
+          onEnter: function () {
+            decodeTargets.forEach(function (element, targetIndex) {
+              animateDecodedText(element, 1.25, targetIndex * 0.2);
+            });
+          },
+        });
+      }
+
+      if (!reducedMotion) {
+        gsap.utils.toArray(".lift-card").forEach(function (card) {
+          const rotateXTo = gsap.quickTo(card, "rotationX", { duration: 0.45, ease: "power3.out" });
+          const rotateYTo = gsap.quickTo(card, "rotationY", { duration: 0.45, ease: "power3.out" });
+          const yTo = gsap.quickTo(card, "y", { duration: 0.45, ease: "power3.out" });
+
+          gsap.set(card, { transformPerspective: 900 });
+
+          card.addEventListener("pointermove", function (event) {
+            if (event.pointerType === "touch") {
+              return;
+            }
+
+            const bounds = card.getBoundingClientRect();
+            const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+            const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+            rotateXTo(vertical * -8);
+            rotateYTo(horizontal * 10);
+            yTo(-7);
+          });
+
+          card.addEventListener("pointerleave", function () {
+            rotateXTo(0);
+            rotateYTo(0);
+            yTo(0);
+          });
         });
       }
 

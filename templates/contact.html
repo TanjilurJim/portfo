@@ -75,6 +75,9 @@
                         <span>Send</span>
                         <span id="contact-submit-loader" style="display:none; margin-left:8px; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; vertical-align:middle; animation: contact-spin 0.8s linear infinite;"></span>
                       </button>
+                      <p id="contact-spam-note" style="display:none; margin-top:14px; font-size:14px; line-height:1.8; color:#555;">
+                        Thanks for reaching out. If my reply is not in your inbox, please check your spam or promotions folder too.
+                      </p>
                     </div>
                     <div class="col-md-5 address-c ontainer">
                       <ul class="list-unstyled">
@@ -143,9 +146,13 @@
 
      if (contactForm && contactSubmitBtn && contactSubmitLoader) {
        contactForm.addEventListener("submit", function () {
+         const spamNote = document.getElementById("contact-spam-note");
          contactSubmitBtn.disabled = true;
          contactSubmitLoader.style.display = "inline-block";
          contactSubmitBtn.querySelector("span").textContent = "Sending...";
+         if (spamNote) {
+           spamNote.style.display = "block";
+         }
        });
      }
   });

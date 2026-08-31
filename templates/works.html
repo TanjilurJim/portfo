@@ -248,11 +248,11 @@
     }
 
     .work-summary {
-      max-width: 42ch;
+      max-width: 34ch;
       margin: 0;
       color: rgba(255, 255, 255, 0.68);
       font-size: 15px;
-      line-height: 1.75;
+      line-height: 1.85;
       font-weight: 500;
     }
 
@@ -311,6 +311,42 @@
       border-color: var(--acid);
       background: var(--acid);
       color: var(--ink);
+    }
+
+    .work-link.magnetic {
+      position: relative;
+      overflow: hidden;
+      transform: translate3d(0, 0, 0);
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+      will-change: transform;
+    }
+
+    .work-link.magnetic::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.22), transparent 62%);
+      opacity: 0;
+      transition: opacity 180ms ease;
+      pointer-events: none;
+    }
+
+    .work-link.magnetic span {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      transition: transform 180ms ease;
+    }
+
+    .work-link.magnetic:hover::before,
+    .work-link.magnetic:focus-visible::before {
+      opacity: 1;
+    }
+
+    .work-link.magnetic:hover,
+    .work-link.magnetic:focus-visible {
+      box-shadow: 0 18px 40px rgba(16, 16, 15, 0.18);
     }
 
     .work-link.primary:hover,
@@ -576,7 +612,9 @@
                     {% endfor %}
                   </div>
                   <div class="work-actions">
-                    <a href="{{ url_for('project_detail', slug=work.slug) }}" class="work-link primary">Discover project</a>
+                    <a href="{{ url_for('project_detail', slug=work.slug) }}" class="work-link primary magnetic" data-magnetic>
+                      <span>Discover project</span>
+                    </a>
                     {% if work.live_url %}
                       <a href="{{ work.live_url }}" class="work-link" target="_blank" rel="noopener">Visit live site &#8599;</a>
                     {% endif %}
@@ -675,6 +713,27 @@
     nextButton.addEventListener("click", () => goToSlide(currentIndex + 1));
     dots.forEach((dot) => {
       dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slideIndex)));
+    });
+
+    const magneticLinks = Array.from(document.querySelectorAll("[data-magnetic]"));
+    magneticLinks.forEach((link) => {
+      const label = link.querySelector("span") || link;
+
+      link.addEventListener("pointermove", (event) => {
+        const rect = link.getBoundingClientRect();
+        const offsetX = ((event.clientX - rect.left) / rect.width - 0.5) * 18;
+        const offsetY = ((event.clientY - rect.top) / rect.height - 0.5) * 10;
+        link.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+        label.style.transform = `translate3d(${offsetX * 0.18}px, ${offsetY * 0.18}px, 0)`;
+      });
+
+      const resetMagnet = () => {
+        link.style.transform = "translate3d(0, 0, 0)";
+        label.style.transform = "translate3d(0, 0, 0)";
+      };
+
+      link.addEventListener("pointerleave", resetMagnet);
+      link.addEventListener("blur", resetMagnet);
     });
 
     viewport.addEventListener("keydown", (event) => {

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Timeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" />
+  <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Roboto Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: "Roboto Mono", monospace;
+    }
+  </style>
+</head>
+<body class="min-h-dvh overflow-x-hidden bg-slate-50 font-mono text-slate-900">
+  {% set timeline = timeline_editor or {} %}
+  {% macro field(name, label, value='', type='text', rows=0, span='') %}
+    <div class="{{ span }}">
+      <label for="timeline_{{ name }}" class="mb-2 block text-sm font-medium text-slate-600">{{ label }}</label>
+      {% if rows %}
+        <textarea id="timeline_{{ name }}" name="{{ name }}" rows="{{ rows }}" class="w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-rose-300 focus:ring-4 focus:ring-rose-100">{{ value }}</textarea>
+      {% else %}
+        <input id="timeline_{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-rose-300 focus:ring-4 focus:ring-rose-100" />
+      {% endif %}
+    </div>
+  {% endmacro %}
+
+  <div class="min-h-dvh lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+    <aside class="border-b border-slate-200 bg-white/95 shadow-sm lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r lg:border-slate-200">
+      <div class="p-6 sm:p-8">
+        <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Private Area</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-900">Timeline Editor</h1>
+        <p class="mt-2 text-sm leading-6 text-slate-500">Signed in as {{ current_user.display_name }}</p>
+
+        <nav class="mt-8 space-y-3">
+          <a href="{{ url_for('dashboard') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Overview</span><span class="text-xs text-slate-400">01</span></a>
+          <a href="{{ url_for('contacts') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Contacts</span><span class="text-xs text-slate-400">02</span></a>
+          <a href="{{ url_for('smtp_settings') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>SMTP Settings</span><span class="text-xs text-slate-400">03</span></a>
+          <a href="{{ url_for('about_editor') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>About Content</span><span class="text-xs text-slate-400">04</span></a>
+          <a href="{{ url_for('timeline_editor') }}" class="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-950"><span>Timeline Content</span><span class="text-xs text-rose-500">05</span></a>
+          <a href="{{ url_for('works_editor') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Works Content</span><span class="text-xs text-slate-400">06</span></a>
+          <a href="{{ url_for('expenses') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Expense Tracker</span><span class="text-xs text-slate-400">07</span></a>
+          <a href="{{ url_for('logout') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Log out</span><span class="text-xs text-slate-400">08</span></a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="min-w-0 p-5 sm:p-8 lg:p-10">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+          <a href="{{ url_for('dashboard') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Overview</a>
+          <a href="{{ url_for('contacts') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Contacts</a>
+          <a href="{{ url_for('smtp_settings') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">SMTP</a>
+          <a href="{{ url_for('about_editor') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">About</a>
+          <a href="{{ url_for('timeline_editor') }}" class="whitespace-nowrap rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-950">Timeline</a>
+          <a href="{{ url_for('works_editor') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Works</a>
+          <a href="{{ url_for('expenses') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Expenses</a>
+        </div>
+
+        <header class="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.4em] text-rose-500/80">Content Management</p>
+              <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">{{ 'Edit Timeline Item' if timeline_editor else 'Add Timeline Item' }}</h2>
+              <p class="mt-4 max-w-2xl leading-7 text-slate-600">
+                Manage the cards that appear in the About page timeline. Each row here maps directly to the public timeline section.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              {% if timeline_editor %}
+                <a href="{{ url_for('timeline_editor') }}" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-slate-950">Add New</a>
+              {% endif %}
+              <a href="{{ url_for('html_page', page_name='about.html') }}" target="_blank" class="rounded-full border border-slate-200 bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Preview About Page</a>
+            </div>
+          </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mb-6 space-y-3">
+              {% for category, message in messages %}
+                <div class="rounded-2xl border px-4 py-3 text-sm {% if category == 'error' %}border-rose-200 bg-rose-50 text-rose-900{% else %}border-emerald-200 bg-emerald-50 text-emerald-900{% endif %}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('timeline_editor') }}" class="space-y-6">
+          <input type="hidden" name="id" value="{{ timeline.id if timeline.id is defined else '' }}" />
+
+          <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <p class="text-xs uppercase tracking-[0.35em] text-rose-500/70">01 / Timeline Item</p>
+            <h3 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">Title and description</h3>
+            <div class="mt-6 grid gap-5 md:grid-cols-2">
+              {{ field('title', 'Timeline title', timeline.title or '') }}
+              {{ field('icon_class', 'Font Awesome icon class', timeline.icon_class or '', 'text') }}
+              {{ field('description', 'Timeline description', timeline.description or '', 'text', 6, 'md:col-span-2') }}
+              {{ field('sort_order', 'Display order', timeline.sort_order if timeline.sort_order is defined else 0, 'number') }}
+              <label class="flex min-h-[56px] items-center gap-3 self-end rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                <input name="is_active" type="checkbox" value="1" {% if timeline.is_active is not defined or timeline.is_active %}checked{% endif %} class="h-5 w-5 rounded border-slate-300 bg-white text-rose-600 focus:ring-rose-200" />
+                Show this item publicly
+              </label>
+            </div>
+          </section>
+
+          <div class="sticky bottom-4 z-20 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-slate-500">{{ 'Updating ' ~ timeline.title if timeline_editor else 'Creating a new timeline item' }}</p>
+            <button type="submit" class="rounded-full bg-slate-900 px-7 py-3 text-sm font-bold text-white transition hover:bg-slate-800">{{ 'Update Timeline Item' if timeline_editor else 'Save Timeline Item' }}</button>
+          </div>
+        </form>
+
+        <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Current Timeline</p>
+              <h3 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">All timeline records</h3>
+            </div>
+            <p class="text-sm text-slate-500">{{ timeline_items | length }} items</p>
+          </div>
+
+          <div class="mt-6 grid gap-4">
+            {% for item in timeline_items %}
+              <article class="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 lg:flex-row lg:items-center lg:justify-between">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="rounded-full bg-white px-3 py-1 text-xs text-slate-500">{{ item.sort_order }}</span>
+                    <span class="text-xs uppercase tracking-[0.25em] {% if item.is_active %}text-emerald-600{% else %}text-amber-600{% endif %}">{{ 'Published' if item.is_active else 'Draft' }}</span>
+                    <span class="text-xs text-slate-400">{{ item.icon_class or 'No icon set' }}</span>
+                  </div>
+                  <h4 class="mt-4 text-xl font-bold tracking-tight text-slate-900">{{ item.title }}</h4>
+                  <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{{ item.description }}</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <a href="{{ url_for('timeline_editor', item_id=item.id) }}" class="rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-800">Edit</a>
+                  <form method="post" action="{{ url_for('toggle_timeline_publish', timeline_id=item.id) }}">
+                    <button type="submit" class="rounded-full border px-4 py-2 text-sm font-semibold transition {% if item.is_active %}border-rose-200 text-rose-700 hover:bg-rose-50{% else %}border-emerald-200 text-emerald-700 hover:bg-emerald-50{% endif %}">
+                      {{ 'Unpublish' if item.is_active else 'Publish' }}
+                    </button>
+                  </form>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

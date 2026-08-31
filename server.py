@@ -455,6 +455,79 @@ def save_about_profile(data):
         )
 
 
+def get_timeline_items(include_inactive=False):
+    visibility_filter = "" if include_inactive else "WHERE is_active = 1"
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM about_timeline
+            {visibility_filter}
+            ORDER BY sort_order ASC, id ASC
+            """
+        ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def get_timeline_item_by_id(timeline_id):
+    if not timeline_id:
+        return None
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute("SELECT * FROM about_timeline WHERE id = ?", (timeline_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def save_timeline_item(data):
+    title = data.get("title", "").strip()
+    if not title:
+        raise ValueError("Title is required.")
+
+    timeline_id = data.get("id", "").strip()
+    fields = {
+        "title": title,
+        "description": data.get("description", "").strip(),
+        "icon_class": data.get("icon_class", "").strip(),
+        "sort_order": int(data.get("sort_order") or 0),
+        "is_active": 1 if data.get("is_active") in {"1", "true", "True", "on", "yes"} else 0,
+    }
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        if timeline_id:
+            cursor = conn.execute(
+                """
+                UPDATE about_timeline
+                SET title = :title,
+                    description = :description,
+                    icon_class = :icon_class,
+                    sort_order = :sort_order,
+                    is_active = :is_active,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id
+                """,
+                {**fields, "id": int(timeline_id)},
+            )
+            if cursor.rowcount == 0:
+                cursor = conn.execute(
+                    """
+                    INSERT INTO about_timeline (title, description, icon_class, sort_order, is_active)
+                    VALUES (:title, :description, :icon_class, :sort_order, :is_active)
+                    """,
+                    fields,
+                )
+            return cursor.lastrowid or int(timeline_id)
+
+        cursor = conn.execute(
+            """
+            INSERT INTO about_timeline (title, description, icon_class, sort_order, is_active)
+            VALUES (:title, :description, :icon_class, :sort_order, :is_active)
+            """,
+            fields,
+        )
+        return cursor.lastrowid
+
+
 def save_work_item(data):
     title = data.get("title", "").strip()
     if not title:
@@ -1726,12 +1799,21 @@ def dashboard():
             FROM contacts
             """
         ).fetchone()
+        timeline_totals = conn.execute(
+            """
+            SELECT
+                COALESCE(COUNT(*), 0) AS total_timeline_items,
+                COALESCE(SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END), 0) AS active_timeline_items
+            FROM about_timeline
+            """
+        ).fetchone()
 
     expense_data = get_expense_overview()
     return render_template(
         'dashboard.html',
         current_user=get_current_user(),
         contact_totals=dict(totals) if totals else {},
+        timeline_totals=dict(timeline_totals) if timeline_totals else {},
         expense_data=expense_data,
     )
 
@@ -1763,6 +1845,61 @@ def about_editor():
         current_user=get_current_user(),
         about_data=get_about_page_data(),
     )
+
+
+@app.route('/dashboard/timeline', methods=['GET', 'POST'])
+@login_required
+def timeline_editor():
+    if not is_admin_user():
+        flash('Only the admin account can edit the timeline.', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        try:
+            saved_id = save_timeline_item(request.form.to_dict())
+            flash('Timeline item saved successfully.', 'success')
+            return redirect(url_for('timeline_editor', item_id=saved_id))
+        except Exception as exc:
+            flash(f'Could not save timeline item: {exc}', 'error')
+
+    selected_timeline_id = request.args.get('item_id', '').strip()
+    return render_template(
+        'timeline_editor.html',
+        current_user=get_current_user(),
+        timeline_items=get_timeline_items(include_inactive=True),
+        timeline_editor=get_timeline_item_by_id(selected_timeline_id),
+    )
+
+
+@app.route('/dashboard/timeline/<int:timeline_id>/toggle-publish', methods=['POST'])
+@login_required
+def toggle_timeline_publish(timeline_id):
+    if not is_admin_user():
+        flash('Only the admin account can publish timeline content.', 'error')
+        return redirect(url_for('dashboard'))
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        row = conn.execute(
+            'SELECT title, is_active FROM about_timeline WHERE id = ?',
+            (timeline_id,),
+        ).fetchone()
+        if not row:
+            flash('Timeline item not found.', 'error')
+            return redirect(url_for('timeline_editor'))
+
+        new_status = 0 if row[1] else 1
+        conn.execute(
+            """
+            UPDATE about_timeline
+            SET is_active = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (new_status, timeline_id),
+        )
+
+    action = 'published' if new_status else 'unpublished'
+    flash(f'{row[0]} {action} successfully.', 'success')
+    return redirect(url_for('timeline_editor', item_id=timeline_id))
 
 
 @app.route('/dashboard/works', methods=['GET', 'POST'])
