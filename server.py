@@ -1368,7 +1368,7 @@ def get_expense_users():
         return [dict(row) for row in rows]
 
 
-def save_transaction(user_id, data):
+def validate_transaction_data(data):
     entry_type = data.get("entry_type", "expense").strip().lower()
     if entry_type not in {"expense", "income"}:
         raise ValueError("Invalid entry type.")
@@ -1381,12 +1381,24 @@ def save_transaction(user_id, data):
     if not amount_raw:
         raise ValueError("Amount is required.")
 
-    amount = float(amount_raw)
+    try:
+        amount = float(amount_raw)
+    except ValueError as exc:
+        raise ValueError("Amount must be a valid number.") from exc
     if amount <= 0:
         raise ValueError("Amount must be greater than zero.")
 
     transaction_date = data.get("transaction_date", "").strip() or date.today().isoformat()
+    try:
+        datetime.strptime(transaction_date, "%Y-%m-%d")
+    except ValueError as exc:
+        raise ValueError("Transaction date must be valid.") from exc
     note = data.get("note", "").strip()
+    return entry_type, purpose, amount, transaction_date, note
+
+
+def save_transaction(user_id, data):
+    entry_type, purpose, amount, transaction_date, note = validate_transaction_data(data)
 
     with sqlite3.connect(DATABASE_PATH) as conn:
         conn.execute(
@@ -1398,6 +1410,37 @@ def save_transaction(user_id, data):
             """,
             (user_id, entry_type, purpose, amount, transaction_date, note),
         )
+
+
+def update_transaction(user_id, transaction_id, data):
+    entry_type, purpose, amount, transaction_date, note = validate_transaction_data(data)
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        cursor = conn.execute(
+            """
+            UPDATE transactions
+            SET entry_type = ?,
+                purpose = ?,
+                amount = ?,
+                transaction_date = ?,
+                note = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND user_id = ?
+            """,
+            (entry_type, purpose, amount, transaction_date, note, transaction_id, user_id),
+        )
+        if cursor.rowcount == 0:
+            raise ValueError("Transaction not found or you do not have permission to update it.")
+
+
+def delete_transaction(user_id, transaction_id):
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        cursor = conn.execute(
+            "DELETE FROM transactions WHERE id = ? AND user_id = ?",
+            (transaction_id, user_id),
+        )
+        if cursor.rowcount == 0:
+            raise ValueError("Transaction not found or you do not have permission to delete it.")
 
 
 def get_available_expense_months(selected_month):
@@ -2190,12 +2233,36 @@ def expenses():
 @app.route('/dashboard/expenses/add', methods=['POST'])
 @login_required
 def add_expense_entry():
+    selected_month = normalize_month_key(request.form.get("selected_month"))
     try:
-        selected_month = normalize_month_key(request.form.get("selected_month"))
         save_transaction(get_current_user_id(), request.form.to_dict())
         flash('Expense tracker entry saved.', 'success')
     except Exception as exc:
         flash(f'Could not save entry: {exc}', 'error')
+    return redirect(url_for('expenses', month=selected_month))
+
+
+@app.route('/dashboard/expenses/<int:transaction_id>/update', methods=['POST'])
+@login_required
+def update_expense_entry(transaction_id):
+    selected_month = normalize_month_key(request.form.get("selected_month"))
+    try:
+        update_transaction(get_current_user_id(), transaction_id, request.form.to_dict())
+        flash('Transaction updated successfully.', 'success')
+    except Exception as exc:
+        flash(f'Could not update transaction: {exc}', 'error')
+    return redirect(url_for('expenses', month=selected_month))
+
+
+@app.route('/dashboard/expenses/<int:transaction_id>/delete', methods=['POST'])
+@login_required
+def delete_expense_entry(transaction_id):
+    selected_month = normalize_month_key(request.form.get("selected_month"))
+    try:
+        delete_transaction(get_current_user_id(), transaction_id)
+        flash('Transaction deleted successfully.', 'success')
+    except Exception as exc:
+        flash(f'Could not delete transaction: {exc}', 'error')
     return redirect(url_for('expenses', month=selected_month))
 
 
