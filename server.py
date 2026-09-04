@@ -6,6 +6,7 @@ from functools import wraps
 from email.message import EmailMessage
 import smtplib
 import ssl
+from uuid import uuid4
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 import sqlite3
@@ -14,9 +15,12 @@ from datetime import datetime, timezone, date
 from pathlib import Path
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.http import http_date
+from werkzeug.utils import secure_filename
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "portfolio.db"
+PROJECT_UPLOAD_DIR = BASE_DIR / "static" / "assets" / "uploads" / "projects"
+PROJECT_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 OWNER_NOTIFY_EMAIL = "tanjilurrahman21@gmail.com"
 
 app = Flask(__name__)
@@ -182,6 +186,19 @@ def static_asset_url(path_value):
     return path_value
 
 
+def save_project_image(file_storage, image_kind):
+    original_name = secure_filename(file_storage.filename or "")
+    extension = Path(original_name).suffix.lower().lstrip(".")
+    if not original_name or extension not in PROJECT_IMAGE_EXTENSIONS:
+        allowed = ", ".join(sorted(PROJECT_IMAGE_EXTENSIONS))
+        raise ValueError(f"Project images must use one of these formats: {allowed}.")
+
+    PROJECT_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    filename = f"{image_kind}-{uuid4().hex}.{extension}"
+    file_storage.save(PROJECT_UPLOAD_DIR / filename)
+    return f"/static/assets/uploads/projects/{filename}"
+
+
 def get_default_projects():
     return [
         {
@@ -197,7 +214,7 @@ def get_default_projects():
             "cover_image": "./static/assets/images/work001-01.jpg",
             "role": "Full-stack development",
             "outcome": "A tailored ERP experience with clean flows, structured data handling, and business-focused screens.",
-            "link_label": "Case study",
+            "link_label": "View project",
             "link_url": "/works/ricemill-erp",
             "sort_order": 1,
             "is_active": 1,
@@ -215,7 +232,7 @@ def get_default_projects():
             "cover_image": "./static/assets/images/work02-hover.jpg",
             "role": "Website development",
             "outcome": "A practical business site with a fast content structure and a maintainable backend foundation.",
-            "link_label": "Case study",
+            "link_label": "View project",
             "link_url": "/works/unisalesbd",
             "sort_order": 2,
             "is_active": 1,
@@ -303,10 +320,11 @@ def normalize_project_row(project):
     project["slug"] = (project.get("slug") or slugify_text(project["title"]))[:120]
     project["summary"] = project.get("summary") or project.get("description", "")
     project["description"] = project.get("description", "")
-    project["link_label"] = project.get("link_label") or "Case study"
+    project["link_label"] = project.get("link_label") or "View project"
     project["link_url"] = project.get("link_url") or f"/works/{project['slug']}"
     project["accent"] = project.get("accent") or "sky"
     project["cover_image"] = static_asset_url(project.get("cover_image") or "./static/assets/images/work001-01.jpg")
+    project["detail_image"] = static_asset_url(project.get("detail_image") or project["cover_image"])
     project["role"] = project.get("role") or "Project work"
     project["outcome"] = project.get("outcome") or ""
     project["live_url"] = project.get("live_url") or project["link_url"]
@@ -544,13 +562,14 @@ def save_work_item(data):
         "title": title,
         "summary": data.get("summary", "").strip(),
         "description": data.get("description", "").strip(),
-        "link_label": data.get("link_label", "").strip() or "Case study",
+        "link_label": data.get("link_label", "").strip() or "View project",
         "link_url": data.get("link_url", "").strip() or f"/works/{slug}",
         "accent": data.get("accent", "").strip() or "sky",
         "stack_json": json.dumps(stack_items),
         "live_url": data.get("live_url", "").strip(),
         "login_url": data.get("login_url", "").strip(),
         "cover_image": data.get("cover_image", "").strip(),
+        "detail_image": data.get("detail_image", "").strip(),
         "role": data.get("role", "").strip(),
         "outcome": data.get("outcome", "").strip(),
         "sort_order": sort_order,
@@ -573,6 +592,7 @@ def save_work_item(data):
                     live_url = :live_url,
                     login_url = :login_url,
                     cover_image = :cover_image,
+                    detail_image = :detail_image,
                     role = :role,
                     outcome = :outcome,
                     sort_order = :sort_order,
@@ -587,11 +607,11 @@ def save_work_item(data):
                     """
                     INSERT INTO about_projects (
                         slug, title, summary, description, link_label, link_url, accent, stack_json,
-                        live_url, login_url, cover_image, role, outcome, sort_order, is_active
+                        live_url, login_url, cover_image, detail_image, role, outcome, sort_order, is_active
                     )
                     VALUES (
                         :slug, :title, :summary, :description, :link_label, :link_url, :accent, :stack_json,
-                        :live_url, :login_url, :cover_image, :role, :outcome, :sort_order, :is_active
+                        :live_url, :login_url, :cover_image, :detail_image, :role, :outcome, :sort_order, :is_active
                     )
                     """,
                     fields,
@@ -601,11 +621,11 @@ def save_work_item(data):
                 """
                 INSERT INTO about_projects (
                     slug, title, summary, description, link_label, link_url, accent, stack_json,
-                    live_url, login_url, cover_image, role, outcome, sort_order, is_active
+                    live_url, login_url, cover_image, detail_image, role, outcome, sort_order, is_active
                 )
                 VALUES (
                     :slug, :title, :summary, :description, :link_label, :link_url, :accent, :stack_json,
-                    :live_url, :login_url, :cover_image, :role, :outcome, :sort_order, :is_active
+                    :live_url, :login_url, :cover_image, :detail_image, :role, :outcome, :sort_order, :is_active
                 )
                 """,
                 fields,
@@ -828,6 +848,7 @@ def init_db():
                 live_url TEXT NOT NULL DEFAULT '',
                 login_url TEXT NOT NULL DEFAULT '',
                 cover_image TEXT NOT NULL DEFAULT '',
+                detail_image TEXT NOT NULL DEFAULT '',
                 role TEXT NOT NULL DEFAULT '',
                 outcome TEXT NOT NULL DEFAULT '',
                 sort_order INTEGER NOT NULL DEFAULT 0,
@@ -850,12 +871,42 @@ def init_db():
             "live_url": "ALTER TABLE about_projects ADD COLUMN live_url TEXT NOT NULL DEFAULT ''",
             "login_url": "ALTER TABLE about_projects ADD COLUMN login_url TEXT NOT NULL DEFAULT ''",
             "cover_image": "ALTER TABLE about_projects ADD COLUMN cover_image TEXT NOT NULL DEFAULT ''",
+            "detail_image": "ALTER TABLE about_projects ADD COLUMN detail_image TEXT NOT NULL DEFAULT ''",
             "role": "ALTER TABLE about_projects ADD COLUMN role TEXT NOT NULL DEFAULT ''",
             "outcome": "ALTER TABLE about_projects ADD COLUMN outcome TEXT NOT NULL DEFAULT ''",
         }
         for column_name, alter_sql in project_column_defaults.items():
             if column_name not in project_columns:
                 conn.execute(alter_sql)
+
+        conn.execute(
+            """
+            UPDATE about_projects
+            SET slug = 'ricemill-erp'
+            WHERE title = 'RiceMill ERP' AND TRIM(slug) = ''
+            """
+        )
+        conn.execute(
+            """
+            UPDATE about_projects
+            SET live_url = 'https://ricemillerp.com/'
+            WHERE slug = 'ricemill-erp' AND TRIM(live_url) = ''
+            """
+        )
+        conn.execute(
+            """
+            UPDATE about_projects
+            SET login_url = 'https://ricemillerp.com/login'
+            WHERE slug = 'ricemill-erp' AND TRIM(login_url) = ''
+            """
+        )
+        conn.execute(
+            """
+            UPDATE about_projects
+            SET link_label = 'View project'
+            WHERE LOWER(TRIM(link_label)) = 'case' || CHAR(32) || 'study'
+            """
+        )
 
         if conn.execute("SELECT COUNT(*) FROM about_profile").fetchone()[0] == 0:
             conn.execute(
@@ -983,7 +1034,7 @@ def init_db():
                         "RiceMill ERP",
                         "ERP software for rice mill operations with TypeScript, React, Laravel, and MySQL.",
                         "A business system built to manage rice mill workflows, operations, and records with a modern TypeScript and React frontend backed by Laravel and MySQL.",
-                        "Case study",
+                        "View project",
                         "/works/ricemill-erp",
                         "sky",
                         json.dumps(["TypeScript", "React", "Laravel", "MySQL"]),
@@ -999,7 +1050,7 @@ def init_db():
                         "UniSalesBD",
                         "Laravel and jQuery-based business site for sales operations and presentation.",
                         "A polished company website and business workflow layer built for UniSalesBD using Laravel, jQuery, and responsive UI patterns.",
-                        "Case study",
+                        "View project",
                         "/works/unisalesbd",
                         "emerald",
                         json.dumps(["Laravel", "jQuery", "PHP"]),
@@ -1911,7 +1962,16 @@ def works_editor():
 
     if request.method == 'POST':
         try:
-            save_work_item(request.form.to_dict())
+            work_data = request.form.to_dict()
+            for upload_field, image_field in (
+                ('cover_image_file', 'cover_image'),
+                ('detail_image_file', 'detail_image'),
+            ):
+                uploaded_image = request.files.get(upload_field)
+                if uploaded_image and uploaded_image.filename:
+                    work_data[image_field] = save_project_image(uploaded_image, image_field)
+
+            save_work_item(work_data)
             flash('Work item saved successfully.', 'success')
             return redirect(url_for('works_editor'))
         except Exception as exc:

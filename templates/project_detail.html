@@ -83,6 +83,15 @@
       position: relative;
     }
 
+    .detail-media-card {
+      display: flex;
+    }
+
+    .detail-media-card .detail-media {
+      width: 100%;
+      min-height: 100%;
+    }
+
     .detail-media::after {
       content: "";
       position: absolute;
@@ -186,6 +195,40 @@
       margin-top: 24px;
     }
 
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .related-card {
+      min-width: 0;
+      height: 100%;
+    }
+
+    .related-card-body {
+      min-width: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .related-summary {
+      display: -webkit-box;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      min-height: calc(1.95em * 3);
+      margin-bottom: 18px;
+    }
+
+    .related-card-body .btn {
+      align-self: flex-start;
+      margin-top: auto;
+    }
+
     @media (max-width: 991px) {
       .detail-hero {
         grid-template-columns: 1fr;
@@ -195,12 +238,26 @@
         min-height: 280px;
       }
 
+      .detail-media-card .detail-media {
+        min-height: 280px;
+      }
+
       .detail-title {
         font-size: 42px;
       }
 
       .info-grid {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .related-summary {
+        min-height: 0;
       }
     }
   </style>
@@ -235,8 +292,8 @@
 <main class="detail-shell">
   <div class="container">
     <div class="detail-hero">
-      <div class="detail-card">
-        <div class="detail-media" style="background-image: url('{{ project.cover_image }}');"></div>
+      <div class="detail-card detail-media-card">
+        <div class="detail-media" style="background-image: url('{{ project.detail_image or project.cover_image }}');"></div>
       </div>
 
       <div class="detail-card">
@@ -281,26 +338,24 @@
       <div class="soft-pill" style="display: inline-flex; margin-bottom: 14px;">Why it matters</div>
       <h3>Built as a real product, not just a portfolio screenshot</h3>
       <p class="detail-copy" style="margin-bottom: 0;">
-        This page can later grow into a full case study with screenshots, architecture notes, challenges, and results. For now, it gives each project its own place and keeps the Works page clean.
+        This page presents the project with its technology, role, outcome, and live links while keeping the main Works page easy to browse.
       </p>
     </div>
 
     {% if work_items|length > 1 %}
       <div class="section-panel">
         <div class="soft-pill" style="display: inline-flex; margin-bottom: 14px;">More work</div>
-        <div class="row">
+        <div class="related-grid">
           {% for related in work_items %}
             {% if related.slug != project.slug %}
-              <div class="col-sm-6">
-                <div class="detail-card" style="margin-bottom: 20px;">
-                  <div style="padding: 20px;">
+                <article class="detail-card related-card">
+                  <div class="related-card-body">
                     <div class="page-number">{{ related.number }}</div>
                     <h4 style="font-size: 28px; margin: 10px 0 12px; font-weight: 800;">{{ related.title }}</h4>
-                    <p class="detail-copy" style="margin-bottom: 18px;">{{ related.summary }}</p>
-                    <a href="{{ url_for('project_detail', slug=related.slug) }}" class="btn btn-default">Open case study</a>
+                    <p class="detail-copy related-summary">{{ related.summary }}</p>
+                    <a href="{{ url_for('project_detail', slug=related.slug) }}" class="btn btn-default">Read more</a>
                   </div>
-                </div>
-              </div>
+                </article>
             {% endif %}
           {% endfor %}
         </div>

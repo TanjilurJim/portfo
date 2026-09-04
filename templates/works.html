@@ -248,6 +248,11 @@
     }
 
     .work-summary {
+      display: -webkit-box;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
       max-width: 34ch;
       margin: 0;
       color: rgba(255, 255, 255, 0.68);
@@ -404,6 +409,19 @@
       padding: 70px 30px;
       color: rgba(255, 255, 255, 0.68);
       text-align: center;
+    }
+
+    @media (min-width: 992px) {
+      .work-title {
+        display: block;
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .work-title::before,
+      .work-title::after {
+        display: none;
+      }
     }
 
     @media (max-width: 991px) {
@@ -600,7 +618,7 @@
               <article class="work-slide" aria-label="{{ loop.index }} of {{ work_items|length }}: {{ work.title }}">
                 <a href="{{ url_for('project_detail', slug=work.slug) }}" class="work-visual" tabindex="-1">
                   <img src="{{ work.cover_image }}" alt="{{ work.title }} project preview" loading="{% if loop.first %}eager{% else %}lazy{% endif %}">
-                  <span class="visual-label">Open case study</span>
+                  <span class="visual-label">View project</span>
                 </a>
                 <div class="work-content">
                   <span class="work-number">Project {{ work.number }}</span>
@@ -748,7 +766,7 @@
     });
 
     viewport.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0) {
+      if (event.button !== 0 || event.target.closest("a, button")) {
         return;
       }
       isDragging = true;

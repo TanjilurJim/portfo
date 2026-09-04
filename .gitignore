@@ -1,6 +1,7 @@
 portfolio.db
 portfolio.db-*
 db_backups/
+static/assets/uploads/projects/
 __pycache__/
 *.pyc
 .env
