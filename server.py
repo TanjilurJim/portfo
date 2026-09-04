@@ -7,6 +7,7 @@ from email.message import EmailMessage
 import smtplib
 import ssl
 from uuid import uuid4
+from html.parser import HTMLParser
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 import sqlite3
@@ -199,6 +200,74 @@ def save_project_image(file_storage, image_kind):
     return f"/static/assets/uploads/projects/{filename}"
 
 
+def is_safe_content_url(value, allow_mailto=False):
+    value = (value or "").strip()
+    lowered = value.lower()
+    allowed_prefixes = ("https://", "http://", "/", "./")
+    if allow_mailto:
+        allowed_prefixes += ("mailto:",)
+    return value if lowered.startswith(allowed_prefixes) else ""
+
+
+class RichTextSanitizer(HTMLParser):
+    allowed_tags = {
+        "p", "br", "strong", "b", "em", "i", "u", "ul", "ol", "li",
+        "h2", "h3", "h4", "blockquote", "a", "img",
+    }
+    void_tags = {"br", "img"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.output = []
+
+    def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
+        if tag not in self.allowed_tags:
+            return
+
+        attributes = dict(attrs)
+        rendered_attrs = []
+        if tag == "a":
+            href = is_safe_content_url(attributes.get("href"), allow_mailto=True)
+            if href:
+                rendered_attrs.extend([
+                    f'href="{html.escape(href, quote=True)}"',
+                    'target="_blank"',
+                    'rel="noopener noreferrer"',
+                ])
+        elif tag == "img":
+            src = is_safe_content_url(attributes.get("src"))
+            if not src:
+                return
+            alt = html.escape(attributes.get("alt", "Project image"), quote=True)
+            rendered_attrs.extend([
+                f'src="{html.escape(src, quote=True)}"',
+                f'alt="{alt}"',
+                'loading="lazy"',
+            ])
+
+        suffix = f" {' '.join(rendered_attrs)}" if rendered_attrs else ""
+        self.output.append(f"<{tag}{suffix}>")
+
+    def handle_endtag(self, tag):
+        tag = tag.lower()
+        if tag in self.allowed_tags and tag not in self.void_tags:
+            self.output.append(f"</{tag}>")
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+
+    def handle_data(self, data):
+        self.output.append(html.escape(data))
+
+
+def sanitize_rich_html(value):
+    sanitizer = RichTextSanitizer()
+    sanitizer.feed(value or "")
+    sanitizer.close()
+    return "".join(sanitizer.output).strip()
+
+
 def get_default_projects():
     return [
         {
@@ -325,6 +394,20 @@ def normalize_project_row(project):
     project["accent"] = project.get("accent") or "sky"
     project["cover_image"] = static_asset_url(project.get("cover_image") or "./static/assets/images/work001-01.jpg")
     project["detail_image"] = static_asset_url(project.get("detail_image") or project["cover_image"])
+    gallery_json = project.get("gallery_json") or "[]"
+    try:
+        gallery_images = json.loads(gallery_json) if isinstance(gallery_json, str) else list(gallery_json)
+    except Exception:
+        gallery_images = []
+    gallery_images = [static_asset_url(item) for item in gallery_images if str(item).strip()]
+    project["gallery_images"] = list(dict.fromkeys(gallery_images))
+    project["gallery_json"] = json.dumps(project["gallery_images"])
+    project["media_images"] = list(dict.fromkeys([project["detail_image"], *project["gallery_images"]]))
+    project["why_title"] = project.get("why_title") or "Built as a real product, not just a portfolio screenshot"
+    project["why_content_html"] = sanitize_rich_html(
+        project.get("why_content_html")
+        or "<p>This project combines practical technology choices, focused delivery, and links to the finished work.</p>"
+    )
     project["role"] = project.get("role") or "Project work"
     project["outcome"] = project.get("outcome") or ""
     project["live_url"] = project.get("live_url") or project["link_url"]
@@ -365,7 +448,8 @@ def get_portfolio_projects(include_inactive=False):
             """
         ).fetchall()
 
-    return [normalize_project_row(dict(row)) for row in rows] or get_default_projects()
+    projects = [normalize_project_row(dict(row)) for row in rows]
+    return projects or [normalize_project_row(project) for project in get_default_projects()]
 
 
 def get_portfolio_project(slug):
@@ -556,6 +640,11 @@ def save_work_item(data):
     sort_order = int(data.get("sort_order") or 0)
     is_active = 1 if data.get("is_active") in {"1", "true", "True", "on", "yes"} else 0
     project_id = data.get("id", "").strip()
+    gallery_raw = data.get("gallery_images", "")
+    if isinstance(gallery_raw, str):
+        gallery_images = [line.strip() for line in gallery_raw.splitlines() if line.strip()]
+    else:
+        gallery_images = [str(item).strip() for item in gallery_raw if str(item).strip()]
 
     fields = {
         "slug": slug,
@@ -570,6 +659,9 @@ def save_work_item(data):
         "login_url": data.get("login_url", "").strip(),
         "cover_image": data.get("cover_image", "").strip(),
         "detail_image": data.get("detail_image", "").strip(),
+        "gallery_json": json.dumps(list(dict.fromkeys(gallery_images))),
+        "why_title": data.get("why_title", "").strip() or "Why this project matters",
+        "why_content_html": sanitize_rich_html(data.get("why_content_html", "")),
         "role": data.get("role", "").strip(),
         "outcome": data.get("outcome", "").strip(),
         "sort_order": sort_order,
@@ -593,6 +685,9 @@ def save_work_item(data):
                     login_url = :login_url,
                     cover_image = :cover_image,
                     detail_image = :detail_image,
+                    gallery_json = :gallery_json,
+                    why_title = :why_title,
+                    why_content_html = :why_content_html,
                     role = :role,
                     outcome = :outcome,
                     sort_order = :sort_order,
@@ -607,11 +702,13 @@ def save_work_item(data):
                     """
                     INSERT INTO about_projects (
                         slug, title, summary, description, link_label, link_url, accent, stack_json,
-                        live_url, login_url, cover_image, detail_image, role, outcome, sort_order, is_active
+                        live_url, login_url, cover_image, detail_image, gallery_json,
+                        why_title, why_content_html, role, outcome, sort_order, is_active
                     )
                     VALUES (
                         :slug, :title, :summary, :description, :link_label, :link_url, :accent, :stack_json,
-                        :live_url, :login_url, :cover_image, :detail_image, :role, :outcome, :sort_order, :is_active
+                        :live_url, :login_url, :cover_image, :detail_image, :gallery_json,
+                        :why_title, :why_content_html, :role, :outcome, :sort_order, :is_active
                     )
                     """,
                     fields,
@@ -621,11 +718,13 @@ def save_work_item(data):
                 """
                 INSERT INTO about_projects (
                     slug, title, summary, description, link_label, link_url, accent, stack_json,
-                    live_url, login_url, cover_image, detail_image, role, outcome, sort_order, is_active
+                    live_url, login_url, cover_image, detail_image, gallery_json,
+                    why_title, why_content_html, role, outcome, sort_order, is_active
                 )
                 VALUES (
                     :slug, :title, :summary, :description, :link_label, :link_url, :accent, :stack_json,
-                    :live_url, :login_url, :cover_image, :detail_image, :role, :outcome, :sort_order, :is_active
+                    :live_url, :login_url, :cover_image, :detail_image, :gallery_json,
+                    :why_title, :why_content_html, :role, :outcome, :sort_order, :is_active
                 )
                 """,
                 fields,
@@ -849,6 +948,9 @@ def init_db():
                 login_url TEXT NOT NULL DEFAULT '',
                 cover_image TEXT NOT NULL DEFAULT '',
                 detail_image TEXT NOT NULL DEFAULT '',
+                gallery_json TEXT NOT NULL DEFAULT '[]',
+                why_title TEXT NOT NULL DEFAULT '',
+                why_content_html TEXT NOT NULL DEFAULT '',
                 role TEXT NOT NULL DEFAULT '',
                 outcome TEXT NOT NULL DEFAULT '',
                 sort_order INTEGER NOT NULL DEFAULT 0,
@@ -872,6 +974,9 @@ def init_db():
             "login_url": "ALTER TABLE about_projects ADD COLUMN login_url TEXT NOT NULL DEFAULT ''",
             "cover_image": "ALTER TABLE about_projects ADD COLUMN cover_image TEXT NOT NULL DEFAULT ''",
             "detail_image": "ALTER TABLE about_projects ADD COLUMN detail_image TEXT NOT NULL DEFAULT ''",
+            "gallery_json": "ALTER TABLE about_projects ADD COLUMN gallery_json TEXT NOT NULL DEFAULT '[]'",
+            "why_title": "ALTER TABLE about_projects ADD COLUMN why_title TEXT NOT NULL DEFAULT ''",
+            "why_content_html": "ALTER TABLE about_projects ADD COLUMN why_content_html TEXT NOT NULL DEFAULT ''",
             "role": "ALTER TABLE about_projects ADD COLUMN role TEXT NOT NULL DEFAULT ''",
             "outcome": "ALTER TABLE about_projects ADD COLUMN outcome TEXT NOT NULL DEFAULT ''",
         }
@@ -1970,6 +2075,23 @@ def works_editor():
                 uploaded_image = request.files.get(upload_field)
                 if uploaded_image and uploaded_image.filename:
                     work_data[image_field] = save_project_image(uploaded_image, image_field)
+
+            gallery_images = [
+                line.strip()
+                for line in work_data.get('gallery_images', '').splitlines()
+                if line.strip()
+            ]
+            for uploaded_image in request.files.getlist('gallery_image_files'):
+                if uploaded_image and uploaded_image.filename:
+                    gallery_images.append(save_project_image(uploaded_image, 'gallery'))
+            work_data['gallery_images'] = '\n'.join(dict.fromkeys(gallery_images))
+
+            rich_content = work_data.get('why_content_html', '')
+            for uploaded_image in request.files.getlist('why_image_files'):
+                if uploaded_image and uploaded_image.filename:
+                    image_url = save_project_image(uploaded_image, 'content')
+                    rich_content += f'<p><img src="{html.escape(image_url, quote=True)}" alt="Project image"></p>'
+            work_data['why_content_html'] = rich_content
 
             save_work_item(work_data)
             flash('Work item saved successfully.', 'success')

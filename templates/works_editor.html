@@ -118,6 +118,15 @@
                 <label for="work_detail_image_file" class="mb-2 block text-sm font-medium text-white/75">Upload a new project-detail image</label>
                 <input id="work_detail_image_file" name="detail_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="block w-full rounded-xl border border-dashed border-white/20 bg-black/30 px-4 py-3 text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:font-semibold file:text-black hover:file:bg-amber-200" />
               </div>
+              <div class="md:col-span-2">
+                <label for="work_gallery_images" class="mb-2 block text-sm font-medium text-white/75">Gallery image paths or URLs, one per line</label>
+                <textarea id="work_gallery_images" name="gallery_images" rows="5" class="w-full rounded-xl border border-white/15 bg-black/30 px-4 py-3 text-sm leading-6 text-white outline-none transition focus:border-amber-300/70">{{ work.gallery_images | join('\n') if work.gallery_images else '' }}</textarea>
+              </div>
+              <div class="md:col-span-2">
+                <label for="work_gallery_image_files" class="mb-2 block text-sm font-medium text-white/75">Upload gallery images</label>
+                <input id="work_gallery_image_files" name="gallery_image_files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" class="block w-full rounded-xl border border-dashed border-white/20 bg-black/30 px-4 py-3 text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:font-semibold file:text-black hover:file:bg-amber-200" />
+                <p class="mt-2 text-xs leading-5 text-white/45">Select several files at once. New uploads are added to the gallery list above.</p>
+              </div>
             </div>
             {% if work.cover_image or work.detail_image %}
               <div class="mt-5 grid gap-4 md:grid-cols-2">
@@ -131,10 +140,43 @@
                 </figure>
               </div>
             {% endif %}
+            {% if work.gallery_images %}
+              <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {% for gallery_image in work.gallery_images %}
+                  <img src="{{ gallery_image }}" alt="Gallery image {{ loop.index }}" class="h-28 w-full rounded-xl border border-white/10 object-cover object-center" />
+                {% endfor %}
+              </div>
+            {% endif %}
           </section>
 
           <section class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-7">
-            <p class="text-xs uppercase tracking-[0.35em] text-emerald-200/65">03 / Project Details</p>
+            <p class="text-xs uppercase tracking-[0.35em] text-violet-200/65">03 / Why It Matters</p>
+            <h3 class="mt-2 text-2xl font-bold">Rich project content</h3>
+            <div class="mt-6 space-y-5">
+              {{ field('why_title', 'Section heading', work.why_title or 'Built as a real product, not just a portfolio screenshot') }}
+              <div>
+                <label class="mb-2 block text-sm font-medium text-white/75" for="whyRichEditor">Formatted content</label>
+                <div class="flex flex-wrap gap-2 rounded-t-xl border border-b-0 border-white/15 bg-black/50 p-2" aria-label="Rich text controls">
+                  <button type="button" data-rich-command="bold" class="rounded-lg border border-white/15 px-3 py-2 text-xs font-bold hover:bg-white hover:text-black">Bold</button>
+                  <button type="button" data-rich-command="italic" class="rounded-lg border border-white/15 px-3 py-2 text-xs italic hover:bg-white hover:text-black">Italic</button>
+                  <button type="button" data-rich-command="insertUnorderedList" class="rounded-lg border border-white/15 px-3 py-2 text-xs hover:bg-white hover:text-black">List</button>
+                  <button type="button" data-rich-command="formatBlock" data-rich-value="h3" class="rounded-lg border border-white/15 px-3 py-2 text-xs hover:bg-white hover:text-black">Heading</button>
+                  <button type="button" data-rich-command="createLink" class="rounded-lg border border-white/15 px-3 py-2 text-xs hover:bg-white hover:text-black">Add link</button>
+                  <button type="button" data-rich-command="insertImage" class="rounded-lg border border-white/15 px-3 py-2 text-xs hover:bg-white hover:text-black">Image URL</button>
+                  <button type="button" data-rich-command="removeFormat" class="rounded-lg border border-white/15 px-3 py-2 text-xs hover:bg-white hover:text-black">Clear format</button>
+                </div>
+                <div id="whyRichEditor" contenteditable="true" class="min-h-56 rounded-b-xl border border-white/15 bg-black/30 px-4 py-3 text-sm leading-7 text-white outline-none focus:border-violet-300/70">{{ (work.why_content_html or '<p>Explain why this project matters.</p>') | safe }}</div>
+                <textarea id="work_why_content_html" name="why_content_html" class="hidden" aria-hidden="true"></textarea>
+              </div>
+              <div>
+                <label for="work_why_image_files" class="mb-2 block text-sm font-medium text-white/75">Add images to this section</label>
+                <input id="work_why_image_files" name="why_image_files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" class="block w-full rounded-xl border border-dashed border-white/20 bg-black/30 px-4 py-3 text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:font-semibold file:text-black hover:file:bg-violet-200" />
+              </div>
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-7">
+            <p class="text-xs uppercase tracking-[0.35em] text-emerald-200/65">04 / Project Details</p>
             <h3 class="mt-2 text-2xl font-bold">Role, outcome, and visibility</h3>
             <div class="mt-6 grid gap-5 md:grid-cols-2">
               {{ field('role', 'Your role', work.role or '') }}
@@ -191,5 +233,35 @@
       </div>
     </main>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const editor = document.getElementById("whyRichEditor");
+      const hiddenInput = document.getElementById("work_why_content_html");
+      const form = editor ? editor.closest("form") : null;
+
+      document.querySelectorAll("[data-rich-command]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          const command = button.dataset.richCommand;
+          let value = button.dataset.richValue || null;
+          if (command === "createLink") {
+            value = window.prompt("Enter the link URL, including https://");
+          } else if (command === "insertImage") {
+            value = window.prompt("Enter the image URL or /static path");
+          }
+          if ((command === "createLink" || command === "insertImage") && !value) {
+            return;
+          }
+          editor.focus();
+          document.execCommand(command, false, value);
+        });
+      });
+
+      if (form && hiddenInput) {
+        form.addEventListener("submit", function () {
+          hiddenInput.value = editor.innerHTML;
+        });
+      }
+    });
+  </script>
 </body>
 </html>
