@@ -14,6 +14,28 @@ Form submissions are stored in `portfolio.db`, a local SQLite database created a
 3. Point your WSGI file at `server:app`.
 4. Keep `portfolio.db` in the project folder so the app can write to it.
 
+### Database migrations
+
+After pulling code that contains database changes, activate the virtualenv and
+run the schema migration command:
+
+```bash
+workon my-virtualenv
+cd ~/portfo
+python migrate_schema.py
+```
+
+The command uses the schema definitions in `server.py`, creates a timestamped
+backup in `db_backups/`, and then creates missing tables and columns. It is safe
+to run again when the schema is already current. Reload the web app from the
+PythonAnywhere **Web** tab after the migration succeeds.
+
+To migrate a database at a different path:
+
+```bash
+python migrate_schema.py --database /path/to/portfolio.db
+```
+
 ### SQLite tables
 
 - `contacts` stores contact form submissions plus read and delivery status.

@@ -21,7 +21,6 @@ OWNER_NOTIFY_EMAIL = "tanjilurrahman21@gmail.com"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-this")
-print(__name__)
 
 
 def _last_commit_datetime():
@@ -1079,7 +1078,8 @@ def init_db():
             )
 
 
-init_db()
+if os.environ.get("PORTFOLIO_SKIP_AUTO_DB_INIT") != "1":
+    init_db()
 
 
 def get_current_user():
