@@ -52,7 +52,7 @@ python migrate_schema.py --database /path/to/portfolio.db
 - Expense tracker: `/dashboard/expenses`
 - SMTP settings page: `/dashboard/smtp-settings`
 - Starter accounts:
-  - `tanjilurrahman21@gmail.com` / `123456`
-  - `nazianuzhat90@gmail.com` / `123456`
+  - `` / `123456`
+  - `` / `123456`
 
 Replace those starter passwords after your first login.
