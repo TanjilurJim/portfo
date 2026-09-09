@@ -9,7 +9,7 @@ import ssl
 from uuid import uuid4
 from html.parser import HTMLParser
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 import sqlite3
 import subprocess
 from datetime import datetime, timezone, date
@@ -98,6 +98,7 @@ def get_about_page_data():
         {"label": "Facebook", "icon_class": "fab fa-facebook-f", "url": "https://www.facebook.com/RageAgainstJim/", "sort_order": 3},
         {"label": "Instagram", "icon_class": "fab fa-instagram", "url": "https://www.instagram.com/rage.against.jim", "sort_order": 4},
         {"label": "Twitter", "icon_class": "fab fa-twitter", "url": "https://twitter.com/4thSpiderman", "sort_order": 5},
+        {"label": "LeetCode", "icon_class": "fas fa-code", "url": "https://leetcode.com/u/Jdot21/", "sort_order": 6},
     ]
 
     default_timeline = [
@@ -159,11 +160,15 @@ def get_about_page_data():
             "SELECT * FROM about_projects WHERE is_active = 1 ORDER BY sort_order ASC, id ASC"
         ).fetchall()
 
+    timeline_items = [normalize_timeline_row(dict(row)) for row in timeline_rows]
+    if not timeline_items:
+        timeline_items = [normalize_timeline_row(item) for item in default_timeline]
+
     profile = dict(profile_row) if profile_row else default_profile
     return {
         **profile,
         "social_links": [dict(row) for row in social_rows] or default_social_links,
-        "timeline_items": [dict(row) for row in timeline_rows] or default_timeline,
+        "timeline_items": timeline_items,
         "skill_items": [dict(row) for row in skill_rows] or default_skills,
         "project_items": [normalize_project_row(dict(row)) for row in project_rows] or get_default_projects(),
     }
@@ -172,6 +177,34 @@ def get_about_page_data():
 def slugify_text(value):
     slug = re.sub(r'[^a-z0-9]+', '-', (value or '').lower()).strip('-')
     return slug or 'project'
+
+
+def normalize_timeline_month(value):
+    value = (value or "").strip()
+    if not value:
+        return ""
+    if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", value):
+        raise ValueError("Timeline dates must use a valid year and month.")
+    try:
+        datetime.strptime(value, "%Y-%m")
+    except ValueError as exc:
+        raise ValueError("Timeline dates must use a valid year and month.") from exc
+    return value
+
+
+def normalize_timeline_row(row):
+    item = dict(row)
+    start_date = item.get("start_date") or ""
+    end_date = item.get("end_date") or ""
+    if start_date:
+        start_label = datetime.strptime(start_date, "%Y-%m").strftime("%b %Y")
+        end_label = datetime.strptime(end_date, "%Y-%m").strftime("%b %Y") if end_date else "Present"
+        item["date_label"] = f"{start_label} - {end_label}"
+    elif end_date:
+        item["date_label"] = f"Until {datetime.strptime(end_date, '%Y-%m').strftime('%b %Y')}"
+    else:
+        item["date_label"] = ""
+    return item
 
 
 def static_asset_url(path_value):
@@ -568,7 +601,7 @@ def get_timeline_items(include_inactive=False):
             ORDER BY sort_order ASC, id ASC
             """
         ).fetchall()
-    return [dict(row) for row in rows]
+    return [normalize_timeline_row(dict(row)) for row in rows]
 
 
 def get_timeline_item_by_id(timeline_id):
@@ -577,7 +610,7 @@ def get_timeline_item_by_id(timeline_id):
     with sqlite3.connect(DATABASE_PATH) as conn:
         conn.row_factory = sqlite3.Row
         row = conn.execute("SELECT * FROM about_timeline WHERE id = ?", (timeline_id,)).fetchone()
-    return dict(row) if row else None
+    return normalize_timeline_row(dict(row)) if row else None
 
 
 def save_timeline_item(data):
@@ -586,10 +619,17 @@ def save_timeline_item(data):
         raise ValueError("Title is required.")
 
     timeline_id = data.get("id", "").strip()
+    start_date = normalize_timeline_month(data.get("start_date"))
+    end_date = normalize_timeline_month(data.get("end_date"))
+    if start_date and end_date and end_date < start_date:
+        raise ValueError("The timeline end date cannot be before the start date.")
+
     fields = {
         "title": title,
         "description": data.get("description", "").strip(),
         "icon_class": data.get("icon_class", "").strip(),
+        "start_date": start_date,
+        "end_date": end_date,
         "sort_order": int(data.get("sort_order") or 0),
         "is_active": 1 if data.get("is_active") in {"1", "true", "True", "on", "yes"} else 0,
     }
@@ -602,6 +642,8 @@ def save_timeline_item(data):
                 SET title = :title,
                     description = :description,
                     icon_class = :icon_class,
+                    start_date = :start_date,
+                    end_date = :end_date,
                     sort_order = :sort_order,
                     is_active = :is_active,
                     updated_at = CURRENT_TIMESTAMP
@@ -612,8 +654,8 @@ def save_timeline_item(data):
             if cursor.rowcount == 0:
                 cursor = conn.execute(
                     """
-                    INSERT INTO about_timeline (title, description, icon_class, sort_order, is_active)
-                    VALUES (:title, :description, :icon_class, :sort_order, :is_active)
+                    INSERT INTO about_timeline (title, description, icon_class, start_date, end_date, sort_order, is_active)
+                    VALUES (:title, :description, :icon_class, :start_date, :end_date, :sort_order, :is_active)
                     """,
                     fields,
                 )
@@ -621,8 +663,8 @@ def save_timeline_item(data):
 
         cursor = conn.execute(
             """
-            INSERT INTO about_timeline (title, description, icon_class, sort_order, is_active)
-            VALUES (:title, :description, :icon_class, :sort_order, :is_active)
+            INSERT INTO about_timeline (title, description, icon_class, start_date, end_date, sort_order, is_active)
+            VALUES (:title, :description, :icon_class, :start_date, :end_date, :sort_order, :is_active)
             """,
             fields,
         )
@@ -910,6 +952,8 @@ def init_db():
                 title TEXT NOT NULL,
                 description TEXT NOT NULL DEFAULT '',
                 icon_class TEXT NOT NULL DEFAULT '',
+                start_date TEXT NOT NULL DEFAULT '',
+                end_date TEXT NOT NULL DEFAULT '',
                 sort_order INTEGER NOT NULL DEFAULT 0,
                 is_active INTEGER NOT NULL DEFAULT 1,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -991,6 +1035,13 @@ def init_db():
             WHERE title = 'RiceMill ERP' AND TRIM(slug) = ''
             """
         )
+
+        timeline_columns = {row[1] for row in conn.execute("PRAGMA table_info(about_timeline)").fetchall()}
+        if "start_date" not in timeline_columns:
+            conn.execute("ALTER TABLE about_timeline ADD COLUMN start_date TEXT NOT NULL DEFAULT ''")
+        if "end_date" not in timeline_columns:
+            conn.execute("ALTER TABLE about_timeline ADD COLUMN end_date TEXT NOT NULL DEFAULT ''")
+
         conn.execute(
             """
             UPDATE about_projects
@@ -1078,8 +1129,31 @@ def init_db():
                     ("Facebook", "fab fa-facebook-f", "https://www.facebook.com/RageAgainstJim/", 3),
                     ("Instagram", "fab fa-instagram", "https://www.instagram.com/rage.against.jim", 4),
                     ("Twitter", "fab fa-twitter", "https://twitter.com/4thSpiderman", 5),
+                    ("LeetCode", "fas fa-code", "https://leetcode.com/u/Jdot21/", 6),
                 ],
             )
+
+        conn.execute(
+            """
+            UPDATE about_social_links
+            SET label = 'LeetCode',
+                icon_class = 'fas fa-code',
+                url = 'https://leetcode.com/u/Jdot21/',
+                is_active = 1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE LOWER(label) = 'leetcode' OR url = 'https://leetcode.com/u/Jdot21/'
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO about_social_links (label, icon_class, url, sort_order, is_active)
+            SELECT 'LeetCode', 'fas fa-code', 'https://leetcode.com/u/Jdot21/', 6, 1
+            WHERE NOT EXISTS (
+                SELECT 1 FROM about_social_links
+                WHERE LOWER(label) = 'leetcode' OR url = 'https://leetcode.com/u/Jdot21/'
+            )
+            """
+        )
 
         if conn.execute("SELECT COUNT(*) FROM about_timeline").fetchone()[0] == 0:
             conn.executemany(
@@ -2068,6 +2142,37 @@ def timeline_editor():
         timeline_items=get_timeline_items(include_inactive=True),
         timeline_editor=get_timeline_item_by_id(selected_timeline_id),
     )
+
+
+@app.route('/dashboard/timeline/reorder', methods=['POST'])
+@login_required
+def reorder_timeline_items():
+    if not is_admin_user():
+        return jsonify({"ok": False, "error": "Only the admin account can reorder timeline content."}), 403
+
+    payload = request.get_json(silent=True) or {}
+    raw_ids = payload.get("item_ids")
+    if not isinstance(raw_ids, list):
+        return jsonify({"ok": False, "error": "A timeline item order is required."}), 400
+
+    try:
+        item_ids = [int(item_id) for item_id in raw_ids]
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "Timeline item IDs must be numbers."}), 400
+
+    if len(item_ids) != len(set(item_ids)):
+        return jsonify({"ok": False, "error": "The timeline order contains duplicate items."}), 400
+
+    with sqlite3.connect(DATABASE_PATH) as conn:
+        database_ids = {row[0] for row in conn.execute("SELECT id FROM about_timeline").fetchall()}
+        if set(item_ids) != database_ids:
+            return jsonify({"ok": False, "error": "The timeline changed. Refresh the page and try again."}), 409
+        conn.executemany(
+            "UPDATE about_timeline SET sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            [(position, item_id) for position, item_id in enumerate(item_ids, start=1)],
+        )
+
+    return jsonify({"ok": True, "message": "Timeline order saved."})
 
 
 @app.route('/dashboard/timeline/<int:timeline_id>/toggle-publish', methods=['POST'])

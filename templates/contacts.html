@@ -27,61 +27,13 @@
   </style>
 </head>
 <body class="min-h-dvh bg-neutral-950 text-white font-mono overflow-x-hidden">
-  <div class="min-h-dvh lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
-    <aside class="border-b border-white/10 bg-black/30 lg:border-b-0 lg:border-r lg:border-white/10 lg:sticky lg:top-0 lg:h-dvh">
-      <div class="p-6 sm:p-8">
-        <div class="mb-8">
-          <p class="text-xs uppercase tracking-[0.4em] text-white/45">Private Area</p>
-          <h1 class="mt-3 text-3xl font-bold">Contacts</h1>
-          <p class="mt-2 text-sm text-white/60">
-            Signed in as {{ current_user.display_name }}
-          </p>
-        </div>
-
-        <nav class="space-y-3">
-          <a href="{{ url_for('dashboard') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>Overview</span>
-            <span class="text-xs opacity-70">01</span>
-          </a>
-          <a href="{{ url_for('contacts') }}" class="flex items-center justify-between rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>Contacts</span>
-            <span class="text-xs opacity-70">02</span>
-          </a>
-          <a href="{{ url_for('smtp_settings') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>SMTP Settings</span>
-            <span class="text-xs opacity-70">03</span>
-          </a>
-          <a href="{{ url_for('about_editor') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>About Content</span>
-            <span class="text-xs opacity-70">04</span>
-          </a>
-          <a href="{{ url_for('works_editor') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>Works Content</span>
-            <span class="text-xs opacity-70">05</span>
-          </a>
-          <a href="{{ url_for('expenses') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>Expense Tracker</span>
-            <span class="text-xs opacity-70">06</span>
-          </a>
-          <a href="{{ url_for('logout') }}" class="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-sm transition-colors hover:bg-white hover:text-black">
-            <span>Log out</span>
-            <span class="text-xs opacity-70">07</span>
-          </a>
-        </nav>
-      </div>
-    </aside>
+  {% from '_dashboard_navigation.html' import sidebar, mobile_nav with context %}
+  <div class="min-h-dvh lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+    {{ sidebar('contacts') }}
 
     <main class="min-w-0 p-5 sm:p-8 lg:p-10">
       <div class="max-w-6xl">
-        <div class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-          <a href="{{ url_for('dashboard') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Overview</a>
-          <a href="{{ url_for('contacts') }}" class="whitespace-nowrap rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm">Contacts</a>
-          <a href="{{ url_for('smtp_settings') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">SMTP</a>
-          <a href="{{ url_for('about_editor') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">About</a>
-          <a href="{{ url_for('works_editor') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Works</a>
-          <a href="{{ url_for('expenses') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Expenses</a>
-          <a href="{{ url_for('logout') }}" class="whitespace-nowrap rounded-full border border-white/15 px-4 py-2 text-sm">Logout</a>
-        </div>
+        {{ mobile_nav('contacts') }}
 
         <div class="mb-8">
           <p class="text-xs uppercase tracking-[0.4em] text-white/45">Inbox</p>

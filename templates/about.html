@@ -411,6 +411,9 @@
                   <div class="timeline-card lift-card">
                     <div class="soft-pill section-label" style="margin-bottom: 10px;">0{{ loop.index }}</div>
                     <h4 style="margin-bottom: 8px;">{{ item.title }}</h4>
+                    {% if item.date_label %}
+                      <p style="margin: 0 0 8px; color: rgba(20, 184, 166, 0.95); font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;">{{ item.date_label }}</p>
+                    {% endif %}
                     <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ item.description }}</p>
                   </div>
                 </div>

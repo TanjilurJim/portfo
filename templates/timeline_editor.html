@@ -27,6 +27,7 @@
   </style>
 </head>
 <body class="min-h-dvh overflow-x-hidden bg-slate-50 font-mono text-slate-900">
+  {% from '_dashboard_navigation.html' import sidebar, mobile_nav with context %}
   {% set timeline = timeline_editor or {} %}
   {% macro field(name, label, value='', type='text', rows=0, span='') %}
     <div class="{{ span }}">
@@ -40,36 +41,11 @@
   {% endmacro %}
 
   <div class="min-h-dvh lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
-    <aside class="border-b border-slate-200 bg-white/95 shadow-sm lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r lg:border-slate-200">
-      <div class="p-6 sm:p-8">
-        <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Private Area</p>
-        <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-900">Timeline Editor</h1>
-        <p class="mt-2 text-sm leading-6 text-slate-500">Signed in as {{ current_user.display_name }}</p>
-
-        <nav class="mt-8 space-y-3">
-          <a href="{{ url_for('dashboard') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Overview</span><span class="text-xs text-slate-400">01</span></a>
-          <a href="{{ url_for('contacts') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Contacts</span><span class="text-xs text-slate-400">02</span></a>
-          <a href="{{ url_for('smtp_settings') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>SMTP Settings</span><span class="text-xs text-slate-400">03</span></a>
-          <a href="{{ url_for('about_editor') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>About Content</span><span class="text-xs text-slate-400">04</span></a>
-          <a href="{{ url_for('timeline_editor') }}" class="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-950"><span>Timeline Content</span><span class="text-xs text-rose-500">05</span></a>
-          <a href="{{ url_for('works_editor') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Works Content</span><span class="text-xs text-slate-400">06</span></a>
-          <a href="{{ url_for('expenses') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Expense Tracker</span><span class="text-xs text-slate-400">07</span></a>
-          <a href="{{ url_for('logout') }}" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"><span>Log out</span><span class="text-xs text-slate-400">08</span></a>
-        </nav>
-      </div>
-    </aside>
+    {{ sidebar('timeline') }}
 
     <main class="min-w-0 p-5 sm:p-8 lg:p-10">
       <div class="mx-auto max-w-6xl">
-        <div class="mb-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-          <a href="{{ url_for('dashboard') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Overview</a>
-          <a href="{{ url_for('contacts') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Contacts</a>
-          <a href="{{ url_for('smtp_settings') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">SMTP</a>
-          <a href="{{ url_for('about_editor') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">About</a>
-          <a href="{{ url_for('timeline_editor') }}" class="whitespace-nowrap rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-950">Timeline</a>
-          <a href="{{ url_for('works_editor') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Works</a>
-          <a href="{{ url_for('expenses') }}" class="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-700">Expenses</a>
-        </div>
+        {{ mobile_nav('timeline') }}
 
         <header class="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -109,7 +85,9 @@
               {{ field('title', 'Timeline title', timeline.title or '') }}
               {{ field('icon_class', 'Font Awesome icon class', timeline.icon_class or '', 'text') }}
               {{ field('description', 'Timeline description', timeline.description or '', 'text', 6, 'md:col-span-2') }}
-              {{ field('sort_order', 'Display order', timeline.sort_order if timeline.sort_order is defined else 0, 'number') }}
+              {{ field('start_date', 'Start month', timeline.start_date or '', 'month') }}
+              {{ field('end_date', 'End month (leave empty for Present)', timeline.end_date or '', 'month') }}
+              {{ field('sort_order', 'Display order (also managed below)', timeline.sort_order if timeline.sort_order is defined else 0, 'number') }}
               <label class="flex min-h-[56px] items-center gap-3 self-end rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 <input name="is_active" type="checkbox" value="1" {% if timeline.is_active is not defined or timeline.is_active %}checked{% endif %} class="h-5 w-5 rounded border-slate-300 bg-white text-rose-600 focus:ring-rose-200" />
                 Show this item publicly
@@ -129,22 +107,31 @@
               <p class="text-xs uppercase tracking-[0.35em] text-slate-400">Current Timeline</p>
               <h3 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">All timeline records</h3>
             </div>
-            <p class="text-sm text-slate-500">{{ timeline_items | length }} items</p>
+            <div class="text-sm text-slate-500">
+              <p>Drag the handle or use the arrow buttons to change the public order.</p>
+              <p id="timelineOrderStatus" class="mt-1 min-h-5 text-xs font-semibold" aria-live="polite">{{ timeline_items | length }} items</p>
+            </div>
           </div>
 
-          <div class="mt-6 grid gap-4">
+          <div id="timelineSortable" class="mt-6 grid gap-4">
             {% for item in timeline_items %}
-              <article class="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 lg:flex-row lg:items-center lg:justify-between">
-                <div class="min-w-0">
+              <article data-timeline-id="{{ item.id }}" class="group flex flex-col gap-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 transition lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex min-w-0 flex-1 gap-4">
+                  <button type="button" class="timeline-drag-handle mt-1 cursor-grab self-start rounded-xl border border-slate-200 bg-white px-3 py-2 text-lg leading-none text-slate-500 shadow-sm active:cursor-grabbing" aria-label="Drag {{ item.title }} to reorder" title="Drag to reorder">&#8942;&#8942;</button>
+                  <div class="min-w-0">
                   <div class="flex flex-wrap items-center gap-3">
-                    <span class="rounded-full bg-white px-3 py-1 text-xs text-slate-500">{{ item.sort_order }}</span>
+                    <span data-order-number class="rounded-full bg-white px-3 py-1 text-xs text-slate-500">{{ loop.index }}</span>
                     <span class="text-xs uppercase tracking-[0.25em] {% if item.is_active %}text-emerald-600{% else %}text-amber-600{% endif %}">{{ 'Published' if item.is_active else 'Draft' }}</span>
                     <span class="text-xs text-slate-400">{{ item.icon_class or 'No icon set' }}</span>
                   </div>
                   <h4 class="mt-4 text-xl font-bold tracking-tight text-slate-900">{{ item.title }}</h4>
+                  {% if item.date_label %}<p class="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-rose-600">{{ item.date_label }}</p>{% endif %}
                   <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{{ item.description }}</p>
+                  </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
+                  <button type="button" data-move="up" class="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-600 transition hover:bg-white" aria-label="Move {{ item.title }} up">&uarr;</button>
+                  <button type="button" data-move="down" class="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-600 transition hover:bg-white" aria-label="Move {{ item.title }} down">&darr;</button>
                   <a href="{{ url_for('timeline_editor', item_id=item.id) }}" class="rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-800">Edit</a>
                   <form method="post" action="{{ url_for('toggle_timeline_publish', timeline_id=item.id) }}">
                     <button type="submit" class="rounded-full border px-4 py-2 text-sm font-semibold transition {% if item.is_active %}border-rose-200 text-rose-700 hover:bg-rose-50{% else %}border-emerald-200 text-emerald-700 hover:bg-emerald-50{% endif %}">
@@ -159,5 +146,58 @@
       </div>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script>
+    (() => {
+      const list = document.getElementById('timelineSortable');
+      const status = document.getElementById('timelineOrderStatus');
+      if (!list || !status) return;
+
+      const rows = () => Array.from(list.querySelectorAll('[data-timeline-id]'));
+      const refreshNumbers = () => rows().forEach((row, index) => {
+        const number = row.querySelector('[data-order-number]');
+        if (number) number.textContent = index + 1;
+      });
+      const saveOrder = async () => {
+        status.textContent = 'Saving order...';
+        status.className = 'mt-1 min-h-5 text-xs font-semibold text-amber-600';
+        try {
+          const response = await fetch('{{ url_for("reorder_timeline_items") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item_ids: rows().map((row) => Number(row.dataset.timelineId)) }),
+          });
+          const result = await response.json();
+          if (!response.ok || !result.ok) throw new Error(result.error || 'Could not save the timeline order.');
+          status.textContent = 'Timeline order saved.';
+          status.className = 'mt-1 min-h-5 text-xs font-semibold text-emerald-600';
+        } catch (error) {
+          status.textContent = error.message;
+          status.className = 'mt-1 min-h-5 text-xs font-semibold text-rose-600';
+        }
+      };
+
+      if (window.Sortable) {
+        new Sortable(list, {
+          animation: 170,
+          handle: '.timeline-drag-handle',
+          ghostClass: 'opacity-40',
+          onEnd: () => { refreshNumbers(); saveOrder(); },
+        });
+      }
+
+      list.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-move]');
+        if (!button) return;
+        const row = button.closest('[data-timeline-id]');
+        const sibling = button.dataset.move === 'up' ? row.previousElementSibling : row.nextElementSibling;
+        if (!sibling) return;
+        if (button.dataset.move === 'up') list.insertBefore(row, sibling);
+        else list.insertBefore(sibling, row);
+        refreshNumbers();
+        saveOrder();
+      });
+    })();
+  </script>
 </body>
 </html>
