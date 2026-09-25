@@ -166,31 +166,207 @@
       box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
     }
 
+    .skills-stack-row {
+      position: relative;
+      z-index: 2;
+    }
+
+    .projects-stack-row {
+      position: relative;
+      z-index: 4;
+      margin-top: -140px;
+    }
+
+    .projects-stack-panel {
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.15);
+      transform-origin: center top;
+      will-change: transform;
+    }
+
+    .timeline-stack {
+      position: relative;
+      list-style: none;
+      padding: 0;
+      margin: 36px auto 12px;
+      max-width: 940px;
+    }
+
+    .timeline-rail {
+      position: absolute;
+      top: 29px;
+      bottom: 29px;
+      left: calc(50% - 2px);
+      width: 4px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .timeline-progress {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #38bdf8, #0d9488);
+      transform-origin: center top;
+    }
+
     .timeline-item {
+      --step-color: #68bed8;
+      position: relative;
+      width: 85%;
+      margin: 0 0 44px auto;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-item:nth-child(even) {
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .timeline-item:nth-child(5n + 2) { --step-color: #327fa9; }
+    .timeline-item:nth-child(5n + 3) { --step-color: #0f8588; }
+    .timeline-item:nth-child(5n + 4) { --step-color: #1b5d70; }
+    .timeline-item:nth-child(5n + 5) { --step-color: #80b9b8; }
+
+    .timeline-step {
+      position: relative;
+      padding-right: 82px;
+      border-radius: 44px;
+      background: var(--step-color);
+      box-shadow: 16px 22px 30px -20px rgba(15, 23, 42, 0.25);
+      transition: box-shadow 320ms ease, filter 320ms ease;
+    }
+
+    .timeline-item:nth-child(even) .timeline-step {
+      padding-right: 0;
+      padding-left: 82px;
+    }
+
+    .timeline-number {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 82px;
       display: grid;
-      grid-template-columns: 58px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      margin-bottom: 18px;
+      place-items: center;
+      color: #fff;
+      font-family: 'Manrope', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), text-shadow 320ms ease;
+    }
+
+    .timeline-item:nth-child(even) .timeline-number {
+      right: auto;
+      left: 0;
     }
 
     .timeline-icon {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
+      position: relative;
+      z-index: 1;
+      width: 48px;
+      height: 48px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(249, 115, 22, 0.14));
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      color: #0f172a;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      color: #64748b;
+      font-size: 28px;
+      transition: color 220ms ease, transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .timeline-item.is-reached .timeline-icon {
+      color: var(--step-color);
+    }
+
+    .timeline-item.is-reached .timeline-card {
+      border-bottom-color: var(--step-color);
     }
 
     .timeline-card {
-      border-radius: 22px;
-      padding: 20px 22px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(15, 23, 42, 0.08);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      border-radius: 42px;
+      padding: 28px;
+      min-height: 150px;
+      background: linear-gradient(135deg, #ffffff, #f8fafb);
+      border: 4px solid #ffffff;
+      box-shadow: 6px 8px 18px rgba(15, 23, 42, 0.08);
+      transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), border-color 220ms ease, box-shadow 320ms ease, background 320ms ease;
+    }
+
+    .timeline-card::before {
+      content: "";
+      position: absolute;
+      top: -14px;
+      left: 28px;
+      width: 72%;
+      height: 2px;
+      background: var(--step-color);
+      opacity: 0.65;
+      transition: width 360ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 220ms ease;
+    }
+
+    .timeline-icon { flex: 0 0 48px; }
+    .timeline-content { min-width: 0; overflow-wrap: anywhere; }
+    .timeline-content h4 { transition: color 220ms ease; }
+    .timeline-item:nth-child(even) .timeline-card { flex-direction: row-reverse; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .timeline-item:hover .timeline-step {
+        filter: saturate(1.12);
+        box-shadow: 20px 30px 42px -20px rgba(15, 23, 42, 0.34);
+      }
+
+      .timeline-item:hover .timeline-card {
+        transform: translateY(-8px) scale(1.012);
+        border-color: var(--step-color);
+        background: #ffffff;
+        box-shadow: 10px 18px 34px rgba(15, 23, 42, 0.14);
+      }
+
+      .timeline-item:hover .timeline-number {
+        transform: scale(1.13) rotate(3deg);
+        text-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+      }
+
+      .timeline-item:nth-child(even):hover .timeline-number {
+        transform: scale(1.13) rotate(-3deg);
+      }
+
+      .timeline-item:hover .timeline-icon {
+        transform: translateY(-4px) rotate(-8deg) scale(1.12);
+        color: var(--step-color);
+      }
+
+      .timeline-item:nth-child(even):hover .timeline-icon {
+        transform: translateY(-4px) rotate(8deg) scale(1.12);
+      }
+
+      .timeline-item:hover .timeline-card::before {
+        width: calc(100% - 56px);
+        opacity: 1;
+      }
+
+      .timeline-item:hover .timeline-content h4 {
+        color: var(--step-color);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .timeline-step,
+      .timeline-number,
+      .timeline-icon,
+      .timeline-card,
+      .timeline-card::before,
+      .timeline-content h4 {
+        transition: none;
+      }
     }
 
     .snapshot-panel {
@@ -269,8 +445,26 @@
     }
 
     @media (max-width: 767px) {
+      .timeline-item {
+        width: 96%;
+      }
+      .timeline-card {
+        padding: 18px 16px;
+        border-radius: 28px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .timeline-item:nth-child(even) .timeline-card { flex-direction: column; }
+      .timeline-step { padding-right: 52px; border-radius: 30px; }
+      .timeline-item:nth-child(even) .timeline-step { padding-left: 52px; }
+      .timeline-number { width: 52px; font-size: 28px; }
+      .timeline-card h4 { font-size: 21px; }
       .track-card {
         min-width: 260px;
+      }
+      .projects-stack-row {
+        margin-top: -72px;
       }
       .orb-a,
       .orb-b,
@@ -398,33 +592,40 @@
       </div>
 
       <div class="row" style="margin-top: 34px;">
-        <div class="col-xs-12 js-viewport-reveal">
+        <div class="col-xs-12">
           <div class="glass-card" style="border-radius: 28px; padding: 28px;">
             <div class="soft-pill" style="margin-bottom: 16px;">{{ about_data.timeline_title }}</div>
             <p class="about-copy" style="max-width: 760px; margin-bottom: 24px;">{{ about_data.timeline_intro }}</p>
-            <div class="timeline-stack">
+            <div class="timeline-stack js-career-timeline">
+              <div class="timeline-rail" aria-hidden="true"><div class="timeline-progress"></div></div>
+              <ol style="list-style: none; margin: 0; padding: 0;" aria-label="Career timeline">
               {% for item in about_data.timeline_items %}
-                <div class="timeline-item js-viewport-reveal">
-                  <div class="timeline-icon">
+                <li class="timeline-item">
+                  <div class="timeline-step">
+                  <span class="timeline-number" aria-hidden="true">{{ loop.index }}</span>
+                  <div class="timeline-card">
+                  <div class="timeline-icon" aria-hidden="true">
                     <i class="{{ item.icon_class }}"></i>
                   </div>
-                  <div class="timeline-card lift-card">
-                    <div class="soft-pill section-label" style="margin-bottom: 10px;">0{{ loop.index }}</div>
+                  <div class="timeline-content">
                     <h4 style="margin-bottom: 8px;">{{ item.title }}</h4>
                     {% if item.date_label %}
                       <p style="margin: 0 0 8px; color: rgba(20, 184, 166, 0.95); font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;">{{ item.date_label }}</p>
                     {% endif %}
                     <p class="about-copy" style="margin: 0; font-size: 17px; line-height: 1.85;">{{ item.description }}</p>
                   </div>
-                </div>
+                  </div>
+                  </div>
+                </li>
               {% endfor %}
+              </ol>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row" style="margin-top: 34px;">
-        <div class="col-xs-12 js-horizontal-scroll-section js-viewport-reveal">
+      <div class="row skills-stack-row" style="margin-top: 34px;">
+        <div class="col-xs-12 js-horizontal-scroll-section js-skills-scroll-section">
           <div class="glass-card" style="border-radius: 28px; padding: 28px;">
             <div class="soft-pill" style="margin-bottom: 12px;">{{ about_data.skills_title }}</div>
             <p class="about-copy" style="max-width: 760px; margin-bottom: 20px;">{{ about_data.skills_intro }}</p>
@@ -444,14 +645,14 @@
         </div>
       </div>
 
-      <div class="row" style="margin-top: 34px;">
-        <div class="col-xs-12 js-horizontal-scroll-section js-viewport-reveal">
-          <div class="glass-card" style="border-radius: 28px; padding: 28px;">
+      <div class="row projects-stack-row js-projects-stack-row">
+        <div class="col-xs-12 js-horizontal-scroll-section js-projects-scroll-section">
+          <div class="glass-card projects-stack-panel js-projects-stack-panel" style="border-radius: 28px; padding: 28px;">
             <div class="soft-pill" style="margin-bottom: 12px;">{{ about_data.projects_title }}</div>
             <p class="about-copy" style="max-width: 760px; margin-bottom: 20px;">{{ about_data.projects_intro }}</p>
             <div class="horizontal-track">
               {% for project in about_data.project_items %}
-                <article class="track-card lift-card js-track-card">
+                <article class="track-card lift-card js-track-card js-project-card">
                   <div class="soft-pill section-label" style="margin-bottom: 14px;">{{ project.accent|upper }}</div>
                   <h4 style="margin-bottom: 8px;">{{ project.title }}</h4>
                   <p class="about-copy" style="margin-bottom: 18px; font-size: 17px; line-height: 1.85;">{{ project.description }}</p>
@@ -583,6 +784,71 @@
       };
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const careerTimeline = document.querySelector(".js-career-timeline");
+      if (careerTimeline) {
+        const milestones = Array.from(careerTimeline.querySelectorAll(".timeline-item"));
+        const rail = careerTimeline.querySelector(".timeline-rail");
+        const fill = careerTimeline.querySelector(".timeline-progress");
+        let centers = [];
+        const measureTimeline = function () {
+          centers = milestones.map(function (item) {
+            return item.offsetTop + item.offsetHeight / 2;
+          });
+          rail.style.top = (centers[0] || 0) + "px";
+          rail.style.bottom = "auto";
+          rail.style.height = Math.max(0, (centers[centers.length - 1] || 0) - (centers[0] || 0)) + "px";
+        };
+        measureTimeline();
+        if (reducedMotion) {
+          milestones.forEach(function (item) { item.classList.add("is-reached"); });
+          ScrollTrigger.addEventListener("refreshInit", measureTimeline);
+        } else if (milestones.length) {
+          milestones.forEach(function (item, index) {
+            gsap.from(item.querySelector(".timeline-step"), {
+              y: 65,
+              x: index % 2 === 0 ? 28 : -28,
+              autoAlpha: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: item,
+                start: "top 92%",
+                end: "top 65%",
+                scrub: 0.4,
+                invalidateOnRefresh: true,
+              },
+            });
+          });
+          const progress = { value: 0 };
+          const renderTimeline = function () {
+            const first = centers[0];
+            const last = centers[centers.length - 1];
+            const filledTo = first + (last - first) * progress.value;
+            gsap.set(fill, { scaleY: progress.value });
+            milestones.forEach(function (item, index) {
+              item.classList.toggle("is-reached", progress.value > 0 && centers[index] <= filledTo + 0.5);
+            });
+          };
+          renderTimeline();
+          gsap.to(progress, {
+            value: 1,
+            ease: "none",
+            onUpdate: renderTimeline,
+            scrollTrigger: {
+              trigger: careerTimeline,
+              start: function () { return "top+=" + centers[0] + " 65%"; },
+              end: function () { return "top+=" + (centers[centers.length - 1] + 1) + " 65%"; },
+              scrub: 0.25,
+              invalidateOnRefresh: true,
+              onRefreshInit: measureTimeline,
+              onRefresh: renderTimeline,
+            },
+          });
+        }
+        if (document.fonts) {
+          document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+        }
+        window.addEventListener("load", function () { ScrollTrigger.refresh(); }, { once: true });
+      }
       const heroDecode = document.querySelector(".js-hero-decode");
 
       if (heroDecode && !reducedMotion) {
@@ -703,6 +969,29 @@
           },
         });
       });
+
+      const projectsStackRow = document.querySelector(".js-projects-stack-row");
+      const projectsStackPanel = document.querySelector(".js-projects-stack-panel");
+
+      if (projectsStackRow && projectsStackPanel && !reducedMotion) {
+        gsap.fromTo(projectsStackPanel, {
+          y: Math.min(window.innerHeight * 0.22, 180),
+          scale: 0.97,
+          borderRadius: 42,
+        }, {
+          y: 0,
+          scale: 1,
+          borderRadius: 28,
+          ease: "none",
+          scrollTrigger: {
+            trigger: projectsStackRow,
+            start: "top bottom",
+            end: "top top+=110",
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
     }
 
     if (typeof navActivePage === "function") {

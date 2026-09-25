@@ -5,3 +5,4 @@ static/assets/uploads/projects/
 __pycache__/
 *.pyc
 .env
+RUN_PROJECT.md
